@@ -11,8 +11,6 @@
  */
 namespace OCA\OwnNote\AppInfo;
 
-\OC::$CLASSPATH['OwnnoteShareBackend'] = 'ownnote/lib/ownnotessharebackend.php';
-
 use \OCP\AppFramework\App;
 use \OCP\IContainer;
 
@@ -58,7 +56,5 @@ class Application extends App {
 		$container->registerService ( 'Logger', function ($c) {
 			return $c->query ( 'ServerContainer' )->getLogger ();
 		} );
-		
-		\OCP\Share::registerBackend ('ownnote', 'OwnnoteShareBackend');
 	}
 }

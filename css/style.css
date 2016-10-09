@@ -69,14 +69,20 @@
 }
 
 .modified {
-	float: left;
 	color: #A0A0A0;
-	width: 60%;
+	display: inline-block;
+	width: 30%;
+}
+
+.owner {
+        color: #A0A0A0;
+        display: inline-block;
+        width: 30%;
 }
 
 .buttons {
 	float: right;
-	width: 40%;
+	width: 10%;
 	background-repeat:no-repeat;
 	background-position: center center;
 }
@@ -87,6 +93,16 @@
 
 .edit:hover {
 	opacity: 1;
+}
+
+.share {
+	background-image: url('../../../core/img/actions/share.png');
+        opacity: 0.3;
+}
+
+.share:hover {
+        background-image: url('../../../core/img/actions/shared.png');
+        opacity: 1;
 }
 
 .delete {

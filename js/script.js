@@ -46,6 +46,15 @@
 			return s;
 	}
 
+        function shareNote(id) {
+                var n = $(this).attr('n');
+                var g = $(this).attr('g');
+		var user = 'nalch';
+                $.post(ocUrl("ajax/v0.2/ownnote/ajaxshare"), { name: n, group: g, user: user }, function (data) {			
+                        loadListing();
+                });
+        }
+
 	function deleteNote(id) {
 		var n = $(this).attr('n');
 		var g = $(this).attr('g');
@@ -286,6 +295,7 @@
 				html += "		<div class='sortarrow sortup'><!-- --></div>";
 				html += "	</div>";
 				html += "	<div class='info'>";
+				html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
 				html += "		<div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
 				html += "	</div>";
 				listing.sort(sort_by('name', true, function(a){return a.toUpperCase()}));
@@ -294,9 +304,10 @@
 				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
 				html += "		<div class='sortarrow sortdown'><!-- --></div>";
 				html += "	</div>";
-				html += "	<div class='info'>";
-				html += "		<div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
-				html += "	</div>";
+                                html += "       <div class='info'>";
+                                html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
+                                html += "               <div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
+				html += "       </div>";
 				listing.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 			} else if (sortby == "mod" && sortorder == "ascending") {
 				html += "	<div class='filesort notesort'>";
@@ -308,6 +319,9 @@
 				html += "			<div class='sortarrow sortup'><!-- --></div>";
 				html += "		</div>";
 				html += "	</div>";
+                                html += "       <div class='info'>";
+                                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
+                                html += "       </div>";
 				listing.sort(sort_by('mtime', false, parseInt));
 			} else if (sortby == "mod" && sortorder == "descending") {
 				html += "	<div class='filesort notesort'>";
@@ -319,6 +333,9 @@
 				html += "			<div class='sortarrow sortdown'><!-- --></div>";
 				html += "		</div>";
 				html += "	</div>";
+                                html += "       <div class='info'>";
+                                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
+                                html += "       </div>";
 				listing.sort(sort_by('mtime', true, parseInt));
 			}
 			html += "</div>";
@@ -335,12 +352,16 @@
 							fileclass = 'modified latestfile';
 						html += "<div class='listing'>";
 						html += "	<div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</div>";
+						
 						html += "	<div class='info'>";
+						html += "               <div class='owner'>"+listing[i].uid+"</div>";
 						if (listing[i].timestring != '')
 							html += "		<div class='"+fileclass+"'>"+listing[i].timestring+"</div>";
 						else
 							html += "		<div class='"+fileclass+"'>"+trans("Just now")+"</div>";
-						html += "		<div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'><br></div>";
+						
+						html += "               <span><div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'><br/></div>";
+						html += "		<div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'><br/></div></span>";
 						html += "	</div>";
 						html += "</div>";
 					}
@@ -367,6 +388,7 @@
 
 	function bindListing() {
 		$(".file").bind("click", editNote);
+		$(".share-note").bind("click", shareNote);
 		$(".delete-note").bind("click", deleteNote);
 		$("#sortname").bind("click", sortName);
 		$("#sortmod").bind("click", sortMod);

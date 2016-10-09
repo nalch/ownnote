@@ -11,6 +11,9 @@
 
 namespace OCA\OwnNote\AppInfo;
 
+
+
+\OCP\Share::registerBackend ('ownnote', '\OCA\OwnNote\ShareBackend\OwnnoteShareBackend');
 \OCP\App::registerAdmin('ownnote', 'admin');
 
 \OCP\App::addNavigationEntry(array(

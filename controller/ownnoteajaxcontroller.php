@@ -15,6 +15,7 @@ use \OCP\AppFramework\ApiController;
 use \OCP\AppFramework\Http\JSONResponse;
 use \OCP\AppFramework\Http\Response;
 use \OCP\AppFramework\Http;
+use \OCP\AppFramework\UserManager;
 use \OCP\IRequest;
 use \OCA\OwnNote\Lib\Backend;
 
@@ -27,9 +28,9 @@ class OwnnoteAjaxController extends ApiController {
 	private $backend;
 
 
-	public function __construct($appName, IRequest $request){
+	public function __construct($appName, IRequest $request, $userManager, $logger){
 		parent::__construct($appName, $request);
-		$this->backend = new Backend();
+		$this->backend = new Backend($userManager, $logger);
 	}
 
 	/**
@@ -59,6 +60,16 @@ class OwnnoteAjaxController extends ApiController {
 		if (isset($name) && isset($group))
 			return $this->backend->createNote($FOLDER, $name, $group);
 	}
+
+	/**
+        * @NoAdminRequired
+        */
+        public function ajaxshare($name, $group, $user) {
+                $FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
+                if (isset($name) && isset($group) && isset($user))
+                        return $this->backend->shareNote($FOLDER, $name, $group, $user);
+        }
+
 
 	/**
 	* @NoAdminRequired

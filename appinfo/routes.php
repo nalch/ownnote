@@ -38,6 +38,8 @@ $application->registerRoutes($this, array('routes' => array(
 	array('name' => 'ownnote_ajax#ajaxedit', 'url' => '/ajax/v0.2/ownnote/ajaxedit', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#del', 'url' => '/api/v0.2/ownnote/del', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxdel', 'url' => '/ajax/v0.2/ownnote/ajaxdel', 'verb' => 'POST'),
+	array('name' => 'ownnote_api#share', 'url' => '/api/v0.2/ownnote/share', 'verb' => 'POST'),
+        array('name' => 'ownnote_ajax#ajaxshare', 'url' => '/ajax/v0.2/ownnote/ajaxshare', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#save', 'url' => '/api/v0.2/ownnote/save', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxsave', 'url' => '/ajax/v0.2/ownnote/ajaxsave', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#create', 'url' => '/api/v0.2/ownnote/create', 'verb' => 'POST'),

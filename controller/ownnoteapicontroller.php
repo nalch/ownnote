@@ -27,9 +27,9 @@ class OwnnoteApiController extends ApiController {
 	private $backend;
 
 
-	public function __construct($appName, IRequest $request){
+	public function __construct($appName, IRequest $request, $userManager, $logger){
 		parent::__construct($appName, $request);
-		$this->backend = new Backend();
+		$this->backend = new Backend($userManager, $logger);
 	}
 
 	/**
@@ -91,6 +91,16 @@ class OwnnoteApiController extends ApiController {
 		if (isset($name) && isset($group))
 			return $this->backend->editNote($name, $group);
 	}
+
+	/**
+        * @NoAdminRequired
+        * @NoCSRFRequired
+        */
+        public function share($name, $group, $user) {
+                $FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
+                if (isset($name) && isset($group) && isset($user))
+                        return $this->backend->shareNote($FOLDER, $name, $group, $user);
+        }
 
 	/**
 	* @NoAdminRequired
