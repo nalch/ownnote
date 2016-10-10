@@ -268,6 +268,26 @@
 	}
 
 	function buildListing() {
+		var currentUser = document.getElementById("currentUser").value;
+		filteredNotes = listing.filter(function(note) {
+			switch(listingtype) {
+		    case 'All':
+		        return true;
+		        break;
+		    case 'Not grouped':
+		        return note.group == '';
+		        break;
+		    case 'Shared with you':
+		        return $.inArray(currentUser, note.shared_with) != -1;
+		        break;
+		    case 'Shared with others':
+		        return note.uid == currentUser && note.shared_with.length > 0;
+		        break;			        
+		    default:
+		        return note.group == listingtype;
+			}
+		});
+		
 		var html = "";
 		html += "<div id='controls'>";
 		html += "	<div id='new' class='button indent'>"+trans("New")+"</div>";
@@ -282,7 +302,7 @@
 		html += "	</div>";
 		html += "</div>";
 		html += "<div class='listingBlank'><!-- --></div>";
-		var c = listing.length;
+		var c = filteredNotes.length;
 		if (c == 0) {
 			html += "<div class='listingSort'>";
 			html += trans("You have no notes to display.");
@@ -298,17 +318,17 @@
 				html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
 				html += "		<div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
 				html += "	</div>";
-				listing.sort(sort_by('name', true, function(a){return a.toUpperCase()}));
+				filteredNotes.sort(sort_by('name', true, function(a){return a.toUpperCase()}));
 			} else if (sortby == "name" && sortorder == "descending") {
 				html += "	<div class='filesort notesort'>";
 				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
 				html += "		<div class='sortarrow sortdown'><!-- --></div>";
 				html += "	</div>";
-                                html += "       <div class='info'>";
-                                html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
-                                html += "               <div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
-				html += "       </div>";
-				listing.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
+                html += "       <div class='info'>";
+                html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
+                html += "               <div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
+                html += "       </div>";
+				filteredNotes.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 			} else if (sortby == "mod" && sortorder == "ascending") {
 				html += "	<div class='filesort notesort'>";
 				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
@@ -319,10 +339,10 @@
 				html += "			<div class='sortarrow sortup'><!-- --></div>";
 				html += "		</div>";
 				html += "	</div>";
-                                html += "       <div class='info'>";
-                                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
-                                html += "       </div>";
-				listing.sort(sort_by('mtime', false, parseInt));
+                html += "       <div class='info'>";
+                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
+                html += "       </div>";
+                filteredNotes.sort(sort_by('mtime', false, parseInt));
 			} else if (sortby == "mod" && sortorder == "descending") {
 				html += "	<div class='filesort notesort'>";
 				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
@@ -333,38 +353,38 @@
 				html += "			<div class='sortarrow sortdown'><!-- --></div>";
 				html += "		</div>";
 				html += "	</div>";
-                                html += "       <div class='info'>";
-                                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
-                                html += "       </div>";
-				listing.sort(sort_by('mtime', true, parseInt));
+                html += "       <div class='info'>";
+                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
+                html += "       </div>";
+                filteredNotes.sort(sort_by('mtime', true, parseInt));
 			}
 			html += "</div>";
+			
 			for (i = 0; i < c; i++) {
-				if (listing[i].deleted == 0)
-					if (listingtype == "All" || listing[i].group == listingtype || (listingtype == 'Not grouped' && listing[i].group == '')) {
-						var fileclass = 'modified';
-						var name = htmlQuotes(listing[i].name);
-						var group = htmlQuotes(listing[i].group);
-						var file = name;
-						if (group != '')
-							file = "["+group+"] "+name;
-						if (listing[i].timediff < 30)
-							fileclass = 'modified latestfile';
-						html += "<div class='listing'>";
-						html += "	<div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</div>";
-						
-						html += "	<div class='info'>";
-						html += "               <div class='owner'>"+listing[i].uid+"</div>";
-						if (listing[i].timestring != '')
-							html += "		<div class='"+fileclass+"'>"+listing[i].timestring+"</div>";
-						else
-							html += "		<div class='"+fileclass+"'>"+trans("Just now")+"</div>";
-						
-						html += "               <span><div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'><br/></div>";
-						html += "		<div id='"+file+"' i='"+listing[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'><br/></div></span>";
-						html += "	</div>";
-						html += "</div>";
-					}
+				if (filteredNotes[i].deleted == 0) {
+					var fileclass = 'modified';
+					var name = htmlQuotes(filteredNotes[i].name);
+					var group = htmlQuotes(filteredNotes[i].group);
+					var file = name;
+					if (group != '')
+						file = "["+group+"] "+name;
+					if (filteredNotes[i].timediff < 30)
+						fileclass = 'modified latestfile';
+					html += "<div class='listing'>";
+					html += "	<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</div>";
+					
+					html += "	<div class='info'>";
+					html += "               <div class='owner'>"+filteredNotes[i].uid+"</div>";
+					if (filteredNotes[i].timestring != '')
+						html += "		<div class='"+fileclass+"'>"+filteredNotes[i].timestring+"</div>";
+					else
+						html += "		<div class='"+fileclass+"'>"+trans("Just now")+"</div>";
+					
+					html += "               <span><div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'><br/></div>";
+					html += "		<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'><br/></div></span>";
+					html += "	</div>";
+					html += "</div>";
+				}
 			}
 		}
 		document.getElementById("ownnote").innerHTML = html;
@@ -456,14 +476,14 @@
 		buildListing();
 	}
 
-	function buildNavItem(name, count, active) {
+	function buildNavItem(name, count, active, editable=true) {
 		var html = '';
 		var a = ''
 		var n = htmlQuotes(name);
 		if (active) a = " active";
-		if (name == "All" || name == "Not grouped") {
+		if (name == "All" || name == "Not grouped" || name == "Shared with you" || name == "Shared with others") {
 			html += '<li class="group' + a + '" data-type="all">';
-			html += '	<a class="name" id="link-'+n+'" role="button" title="'+n+'">'+htmlQuotes(trans(name))+'</a>';
+			html += '	<a class="name nav-icon-sharingin svg" id="link-'+n+'" role="button" title="'+n+'">'+htmlQuotes(trans(name))+'</a>';
 		} else {
 			html += '<li id="group-'+n+'-edit" class="group editing">';
 			html += '	<ul class="oc-addnew open" style="display: inline-block; width: auto; height: auto;" aria-disabled="false">';
@@ -477,8 +497,10 @@
 			html += '	<a class="name" id="link-'+n+'" role="button" title="'+n+'">'+n+'</a>';
 		}
 		html += '	<span class="utils">';
-		html += '		<a class="icon-rename action edit tooltipped rightwards" group="'+n+'" original-title=""></a>';
-		html += '		<a class="icon-delete action delete tooltipped rightwards" group="'+n+'" original-title=""></a>';
+		if (editable) {
+			html += '		<a class="icon-rename action edit tooltipped rightwards" group="'+n+'" original-title=""></a>';
+			html += '		<a class="icon-delete action delete tooltipped rightwards" group="'+n+'" original-title=""></a>';
+		}
 		html += '		<span class="action numnotes">'+count+'</span>';
 		html += '	</span>';
 		html += '</li>';
@@ -506,8 +528,13 @@
 		counts.length = 0;
 		var html = '';
 		var c = listing.length;
-		var uncat = 0
-                for (i = 0; i < c; i++) {
+		var uncat = 0;
+		
+		var currentUser = document.getElementById("currentUser").value;
+		var sharedin = new Array();
+		var sharedout = new Array();
+		
+        for (i = 0; i < c; i++) {
 			if (listing[i].group != '') {
 				if ($.inArray(listing[i].group, groups) < 0) {
 					groups.push(listing[i].group);
@@ -515,27 +542,33 @@
 				} else {
 					counts[$.inArray(listing[i].group, groups)] += 1;
 				}
-			} else
+			} else {
 				uncat++;
+			}
+			// shared with you
+			if (listing[i].uid !== currentUser) {
+				sharedin.push(listing[i].id);
+			}
+			// shared with others
+			if (listing[i].uid === currentUser && listing[i].shared_with.length > 0) {
+				sharedout.push(listing[i].id);
+			}
 		}
 		sortNav();
+		
+        // add Sharing groups
+		html += buildNavItem("Shared with you", sharedin.length, a == "Shared with you", false);
+		html += buildNavItem("Shared with others", sharedout.length, a == "Shared with others", false);
+		
 		var gc = groups.length;
-		if (a == "All")
-			html += buildNavItem('All', c, true);
-		else
-			html += buildNavItem('All', c, false);
+		html += buildNavItem('All', c, a == "All");
 		if (gc > 0) {
-			if (a == "Not grouped")
-				html += buildNavItem('Not grouped', uncat, true);
-			else
-				html += buildNavItem('Not grouped', uncat, false);
+			html += buildNavItem('Not grouped', uncat, a == "Not grouped");
 		}
-                for (i = 0; i < gc; i++) {
-			if (a == groups[i])
-				html += buildNavItem(groups[i], counts[i], true);
-			else
-				html += buildNavItem(groups[i], counts[i], false);
-		}
+        for (i = 0; i < gc; i++) {
+			html += buildNavItem(groups[i], counts[i], a == groups[i]);
+        }
+        
 		html += "<div id='announcement-container'></div>";
 		$('#grouplist').html(html);
 		bindNav();

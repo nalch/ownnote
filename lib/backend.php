@@ -8,7 +8,15 @@ namespace OCA\OwnNote\Lib;
 use DateTime;
 use DOMDocument;
 
+use \OCP\Constants\PERMISSION_ALL;
+
 class Backend {
+
+	private $userManager;
+
+	public function __construct($userManager) {
+        $this->userManager = $userManager;
+	}
 
 	public function startsWith($haystack, $needle) {
 		return $needle === "" || strripos($haystack, $needle, -strlen($haystack)) !== FALSE;
@@ -126,13 +134,30 @@ class Backend {
 			}
 		}
 	}
+	
+	/**
+	 * Returns a user's owned and shared notes
+	 * @param string $uid the user's id
+	 * @return array the owned notes (uid=uid) and shared notes (OwnnoteShareBackend)
+	 */
+	private function queryNotesWithUser($uid) {
+		// Get owned notes
+		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE uid=? ORDER BY name");
+		$results = $query->execute(Array($uid))->fetchAll();
+		
+		// Get shares
+		$shared_items = \OCP\Share::getItemsSharedWith('ownnote', 42);
+		\OCP\Util::writeLog('ownnote', "shares: ".print_r(count($shared_items), true), \OCP\Util::ERROR);
+		
+		return array_merge($results, $shared_items);		
+	}
 
 	public function getListing($FOLDER, $showdel) {
 		// Get the listing from the database
 		$requery = false;
 		$uid = \OCP\User::getUser();
-		$query = \OCP\DB::prepare("SELECT id, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE uid=? ORDER BY name");
-		$results = $query->execute(Array($uid))->fetchAll();
+		$results = $this->queryNotesWithUser($uid);
+		
 		$results2 = $results;
 		if ($results)
 			foreach($results as $result)
@@ -159,8 +184,7 @@ class Backend {
 						}
 					}
 		if ($requery) {
-			$query = \OCP\DB::prepare("SELECT id, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE uid=? ORDER BY name");
-			$results = $query->execute(Array($uid))->fetchAll();
+			$results = $this->queryNotesWithUser($uid);
 			$requery = false;
 		}
 		// Tests to add a bunch of notes
@@ -242,8 +266,7 @@ class Backend {
 				}
 			}
 			if ($requery) {
-				$query = \OCP\DB::prepare("SELECT id, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE uid=? ORDER BY name");
-				$results = $query->execute(Array($uid))->fetchAll();
+				$results = $this->queryNotesWithUser($uid);
 			}
 			// Now also make sure the files exist, they may not if the user switched folders in admin.
 			if ($results)
@@ -276,12 +299,18 @@ class Backend {
 					$timestring = $this->getTimeString($filetime, $now, $l);
 					$f = array();
 					$f['id'] = $result['id'];
+					$f['uid'] = $result['uid'];
 					$f['name'] = $result['name'];
 					$f['group'] = $result['grouping'];
 					$f['timestring'] = $timestring;
 					$f['mtime'] = $result['mtime'];
 					$f['timediff'] = $now->getTimestamp()-$result['mtime'];
 					$f['deleted'] = $result['deleted'];
+					
+					$shared_with = \OCP\Share::getUsersItemShared('ownnote', $result['id'], $result['uid']);
+					// add shares (all shares, if it's an owned note, only the user for shared notes (not disclosing other sharees))
+					$f['shared_with'] = ($result['uid'] == $uid) ? $shared_with : [$uid];
+
 					$farray[$count] = $f;
 					$count++;
 				}
@@ -298,8 +327,8 @@ class Backend {
 		$fileindb = false;
 		$filedeldb = false;
 		$ret = -1;
-		$query = \OCP\DB::prepare("SELECT id, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE uid=? and name=? and grouping=?");
-		$results = $query->execute(Array($uid, $name, $group))->fetchAll();
+		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE name=? and grouping=?");
+		$results = $query->execute(Array($name, $group))->fetchAll();
 		foreach($results as $result)
 			if ($result['deleted'] == 0) {
 				$fileindb = true;
@@ -308,9 +337,10 @@ class Backend {
 				$filedeldb = true;
 			}
 		if ($filedeldb) {
-			$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote WHERE uid=? and name=? and grouping=?");
-			$results = $query->execute(Array($uid, $name, $group));
+			$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote WHERE name=? and grouping=?");
+			$results = $query->execute(Array($name, $group));
 		}
+		// new note
 		if (! $fileindb) {
 			if ($FOLDER != '') {
 				$tmpfile = $FOLDER."/".$name.".htm";
@@ -330,6 +360,16 @@ class Backend {
 		return $ret;
 	}
 
+	public function shareNote($FOLDER, $name, $group, $user) {
+		// get note
+		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping FROM *PREFIX*ownnote WHERE name=? and grouping=?");
+                $results = $query->execute(Array($name, $group))->fetchAll();
+		$note = $results[0];
+		
+		\OCP\Util::writeLog('ownnote', "share ".print_r($note['uid'], true)."'s ".print_r($note['name']."(".$note['id'].")", true)." with ".print_r($user, true), \OCP\Util::ERROR);
+		$ret_val = \OCP\Share::shareItem('ownnote', $note['id'], \OCP\SHARE::SHARE_TYPE_USER, $user, \OCP\Constants::PERMISSION_ALL);
+		return "DONE";
+    }
 
 	public function deleteNote($FOLDER, $name, $group) {
 		$now = new DateTime();
@@ -356,9 +396,9 @@ class Backend {
 
 	public function editNote($name, $group) {
 		$ret = "";
-		$uid = \OCP\User::getUser();
-		$query = \OCP\DB::prepare("SELECT id,note FROM *PREFIX*ownnote WHERE uid=? and name=? and grouping=?");
-		$results = $query->execute(Array($uid, $name, $group))->fetchAll();
+//		$uid = \OCP\User::getUser();
+		$query = \OCP\DB::prepare("SELECT id, note FROM *PREFIX*ownnote WHERE name=? and grouping=?");
+		$results = $query->execute(Array($name, $group))->fetchAll();
 		foreach($results as $result) {
 			$ret = $result['note'];
 			if ($ret == '') {
@@ -378,7 +418,7 @@ class Backend {
 		$mtime = $now->getTimestamp();
 		if ($in_mtime != 0)
 			$mtime = $in_mtime;
-		$uid = \OCP\User::getUser();
+//		$uid = \OCP\User::getUser();
 		// First check to see if we're creating a new note, createNote handles all of this
 		$id = $this->createNote($FOLDER, $name, $group);
 		if ($id != -1) {
@@ -391,8 +431,8 @@ class Backend {
 					$mtime = $info['mtime'];
 				}
 			}
-			$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', mtime=? WHERE uid=? and name=? and grouping=?");
-			$results = $query->execute(Array($mtime, $uid, $name, $group));
+			$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', mtime=? WHERE id=? and name=? and grouping=?");
+			$results = $query->execute(Array($mtime, $id, $name, $group));
 			$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote_parts WHERE id=?");
 			$results = $query->execute(Array($id));
 			$contentarr = $this->splitContent($content);

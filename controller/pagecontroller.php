@@ -39,14 +39,14 @@ class PageController extends Controller {
      * @NoCSRFRequired
      */
     public function index() {
-	$params = array('user' => $this->userId);
-	$response = new TemplateResponse('ownnote', 'main', $params);
-	$ocVersion = \OCP\Util::getVersion();
-	if ($ocVersion[0] > 8 || ($ocVersion[0] == 8 && $ocVersion[1] >= 1)) {
-		$csp = new \OCP\AppFramework\Http\ContentSecurityPolicy();
-		$csp->addAllowedImageDomain('data:');
-		$response->setContentSecurityPolicy($csp);
-	}
-	return $response;
+		$params = array('user' => $this->userId);
+		$response = new TemplateResponse('ownnote', 'list', $params);
+		$ocVersion = \OCP\Util::getVersion();
+		if ($ocVersion[0] > 8 || ($ocVersion[0] == 8 && $ocVersion[1] >= 1)) {
+			$csp = new \OCP\AppFramework\Http\ContentSecurityPolicy();
+			$csp->addAllowedImageDomain('data:');
+			$response->setContentSecurityPolicy($csp);
+		}
+		return $response;
     }
 }

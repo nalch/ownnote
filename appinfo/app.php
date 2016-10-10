@@ -11,15 +11,19 @@
 
 namespace OCA\OwnNote\AppInfo;
 
-
+$l = \OC::$server->getL10N('ownnote');
 
 \OCP\Share::registerBackend ('ownnote', '\OCA\OwnNote\ShareBackend\OwnnoteShareBackend');
 \OCP\App::registerAdmin('ownnote', 'admin');
+
+$config = \OC::$server->getConfig();
 
 \OCP\App::addNavigationEntry(array(
     // the string under which your app will be referenced in owncloud
     'id' => 'ownnote',
 
+	"appname" => 'ownnote',
+		
     // sorting weight for the navigation. The higher the number, the higher
     // will it be listed in the navigation
     'order' => 10,
@@ -34,5 +38,5 @@ namespace OCA\OwnNote\AppInfo;
     // the title of your application. This will be used in the
     // navigation or on the settings page of your app
     //'name' => \OC_L10N::get('ownnote')->t('Own Note')
-    'name' => \OCP\Util::getL10N('ownnote')->t('Notes')
+    'name' => $l->t('Notes')
 ));

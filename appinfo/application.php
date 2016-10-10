@@ -18,8 +18,6 @@ use \OCA\OwnNote\Controller\PageController;
 use \OCA\OwnNote\Controller\OwnnoteApiController;
 use \OCA\OwnNote\Controller\OwnnoteAjaxController;
 
-use \OCA\OwnNote\Lib\OwnnoteShareBackend;
-
 class Application extends App {
 
 	public function __construct(array $urlParams = array()) {
