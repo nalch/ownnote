@@ -46,14 +46,24 @@
 			return s;
 	}
 
-        function shareNote(id) {
-                var n = $(this).attr('n');
-                var g = $(this).attr('g');
-		var user = 'nalch';
-                $.post(ocUrl("ajax/v0.2/ownnote/ajaxshare"), { name: n, group: g, user: user }, function (data) {			
-                        loadListing();
-                });
-        }
+	function showSidebar() {
+		$('#app-content').addClass('content-with-sidebar');
+        $('#app-sidebar').show();
+	}
+	
+	function hideSidebar() {
+		$('#app-content').removeClass('content-with-sidebar');
+        $('#app-sidebar').hide();
+	}
+	
+    function shareNote(id) {
+        var n = $(this).attr('n');
+        var g = $(this).attr('g');
+        var user = 'nalch';
+        $.post(ocUrl("ajax/v0.2/ownnote/ajaxshare"), { name: n, group: g, user: user }, function (data) {			
+                loadListing();
+        });
+    }
 
 	function deleteNote(id) {
 		var n = $(this).attr('n');
@@ -268,6 +278,7 @@
 	}
 
 	function buildListing() {
+		// filter the notes by group
 		var currentUser = document.getElementById("currentUser").value;
 		filteredNotes = listing.filter(function(note) {
 			switch(listingtype) {
@@ -287,105 +298,118 @@
 		        return note.group == listingtype;
 			}
 		});
-		
+
 		var html = "";
-		html += "<div id='controls'>";
-		html += "	<div id='new' class='button indent'>"+trans("New")+"</div>";
-		html += "	<div id='newfile' class='newfile indent'>";
-		html += "		<form id='createform' class='note-title-form'>";
-		html += "			<input type='text' class='newfileinput' id='newfilename' value='note title'>";
-		html += "			<select id='groupname'></select>";
-		html += "			<input type='text' class='newgroupinput' id='newgroupname' placeholder='group title'>";
-		html += "			<button id='create' class='button'>"+trans("Create")+"</button>";
-		html += "			<div id='cancel' class='button'>"+trans("Cancel")+"</div>";
-		html += "		</form>";
-		html += "	</div>";
-		html += "</div>";
-		html += "<div class='listingBlank'><!-- --></div>";
-		var c = filteredNotes.length;
-		if (c == 0) {
-			html += "<div class='listingSort'>";
-			html += trans("You have no notes to display.");
-			html += "</div>";
-		} else {
-			html += "<div class='listingSort'>";
-			if (sortby == "name" && sortorder == "ascending") {
-				html += "	<div class='filesort notesort'>";
-				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
-				html += "		<div class='sortarrow sortup'><!-- --></div>";
-				html += "	</div>";
-				html += "	<div class='info'>";
-				html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
-				html += "		<div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
-				html += "	</div>";
-				filteredNotes.sort(sort_by('name', true, function(a){return a.toUpperCase()}));
-			} else if (sortby == "name" && sortorder == "descending") {
-				html += "	<div class='filesort notesort'>";
-				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
-				html += "		<div class='sortarrow sortdown'><!-- --></div>";
-				html += "	</div>";
-                html += "       <div class='info'>";
-                html += "               <div class='owner notesort'><span>"+trans("Owner")+"</span></div>";
-                html += "               <div class='modified notesort'><span class='pointer' id='sortmod'>"+trans("Modified")+"</span></div>";
-                html += "       </div>";
-				filteredNotes.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
-			} else if (sortby == "mod" && sortorder == "ascending") {
-				html += "	<div class='filesort notesort'>";
-				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
-				html += "	</div>";
-				html += "	<div class='info'>";
-				html += "		<div class='modified notesort'>";
-				html += "			<div class='pointer sorttitle' id='sortmod'>"+trans("Modified")+"</div>";
-				html += "			<div class='sortarrow sortup'><!-- --></div>";
-				html += "		</div>";
-				html += "	</div>";
-                html += "       <div class='info'>";
-                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
-                html += "       </div>";
-                filteredNotes.sort(sort_by('mtime', false, parseInt));
-			} else if (sortby == "mod" && sortorder == "descending") {
-				html += "	<div class='filesort notesort'>";
-				html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
-				html += "	</div>";
-				html += "	<div class='info'>";
-				html += "		<div class='modified notesort'>";
-				html += "			<div class='pointer sorttitle' id='sortmod'>"+trans("Modified")+"</div>";
-				html += "			<div class='sortarrow sortdown'><!-- --></div>";
-				html += "		</div>";
-				html += "	</div>";
-                html += "       <div class='info'>";
-                html += "               <div class='owner'><span>"+trans("Owner")+"</span></div>";
-                html += "       </div>";
-                filteredNotes.sort(sort_by('mtime', true, parseInt));
-			}
+			html += "<div id='controls'>";
+			html += "	<div id='new' class='button indent'>"+trans("New")+"</div>";
+			html += "	<div id='newfile' class='newfile indent'>";
+			html += "		<form id='createform' class='note-title-form'>";
+			html += "			<input type='text' class='newfileinput' id='newfilename' value='note title'>";
+			html += "			<select id='groupname'></select>";
+			html += "			<input type='text' class='newgroupinput' id='newgroupname' placeholder='group title'>";
+			html += "			<button id='create' class='button'>"+trans("Create")+"</button>";
+			html += "			<div id='cancel' class='button'>"+trans("Cancel")+"</div>";
+			html += "		</form>";
+			html += "	</div>";
 			html += "</div>";
 			
-			for (i = 0; i < c; i++) {
-				if (filteredNotes[i].deleted == 0) {
-					var fileclass = 'modified';
-					var name = htmlQuotes(filteredNotes[i].name);
-					var group = htmlQuotes(filteredNotes[i].group);
-					var file = name;
-					if (group != '')
-						file = "["+group+"] "+name;
-					if (filteredNotes[i].timediff < 30)
-						fileclass = 'modified latestfile';
-					html += "<div class='listing'>";
-					html += "	<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</div>";
-					
-					html += "	<div class='info'>";
-					html += "               <div class='owner'>"+filteredNotes[i].uid+"</div>";
-					if (filteredNotes[i].timestring != '')
-						html += "		<div class='"+fileclass+"'>"+filteredNotes[i].timestring+"</div>";
-					else
-						html += "		<div class='"+fileclass+"'>"+trans("Just now")+"</div>";
-					
-					html += "               <span><div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'><br/></div>";
-					html += "		<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'><br/></div></span>";
-					html += "	</div>";
-					html += "</div>";
+			html += "<div class='listingBlank'><!-- --></div>";
+			
+			var c = filteredNotes.length;
+			if (c == 0) {
+				html += "<div id='emptycontent'>";
+				html += "	<div class='icon-note'></div>";
+				html += "	<h2>"+trans("You have no notes to display")+"</h2>";
+				html += "	<p class='uploadmessage'>"+trans("Create new notes or let others share their notes with you")+"</p>";
+				html += "</div>";
+			} else {
+				html += "<table class='listingSort'>";
+				html += "<thead>";
+				html += "<tr>";
+				if (sortby == "name" && sortorder == "ascending") {
+					html += "	<th class='notename filesort notesort'>";
+					html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
+					html += "		<div class='sortarrow sortup'><!-- --></div>";
+					html += "	</th>";
+					html += "	<th class='actions'></th>";
+					html += "	<th class='info modified notesort'>";
+					html += "		<span class='pointer' id='sortmod'>"+trans("Modified")+"</span>";
+					html += "	</th>";
+					filteredNotes.sort(sort_by('name', true, function(a){return a.toUpperCase()}));
+				} else if (sortby == "name" && sortorder == "descending") {
+					html += "	<th class='notename filesort notesort'>";
+					html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
+					html += "		<div class='sortarrow sortdown'><!-- --></div>";
+					html += "	</th>";
+					html += "	<th class='actions'></th>";
+					html += "   <th class='info modified notesort'>";
+	                html += "       <span class='pointer' id='sortmod'>"+trans("Modified")+"</span>";
+	                html += "   </th>";
+					filteredNotes.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
+				} else if (sortby == "mod" && sortorder == "ascending") {
+					html += "	<th class='notename filesort notesort'>";
+					html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
+					html += "	</th>";
+					html += "	<th class='actions'></th>";
+					html += "	<th class='info modified notesort'>";
+					html += "		<div class='pointer sorttitle' id='sortmod'>"+trans("Modified")+"</div>";
+					html += "		<div class='sortarrow sortup'><!-- --></div>";
+					html += "	</th>";
+	                filteredNotes.sort(sort_by('mtime', false, parseInt));
+				} else if (sortby == "mod" && sortorder == "descending") {
+					html += "	<th class='notename filesort notesort'>";
+					html += "		<div class='pointer sorttitle' id='sortname'>"+trans("Name")+"</div>";
+					html += "	</th>";
+					html += "	<th class='actions'></th>";
+					html += "	<th class='info modified notesort'>";
+					html += "		<div class='pointer sorttitle' id='sortmod'>"+trans("Modified")+"</div>";
+					html += "		<div class='sortarrow sortdown'><!-- --></div>";
+					html += "	</th>";
+	                filteredNotes.sort(sort_by('mtime', true, parseInt));
 				}
-			}
+				html += "</tr>";
+				html += "</thead>";
+				
+				for (i = 0; i < c; i++) {
+					if (filteredNotes[i].deleted == 0) {
+						var fileclass = 'modified';
+						var name = htmlQuotes(filteredNotes[i].name);
+						var group = htmlQuotes(filteredNotes[i].group);
+						var file = name;
+						if (group != '')
+							file = "["+group+"] "+name;
+						if (filteredNotes[i].timediff < 30)
+							fileclass = 'modified latestfile';
+						html += "<tr class='listing'>";
+						html += "	<td id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</td>";
+						
+						html += "	<td class='actions'>";
+						html += "		<div id='"+file+"-delete' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'></div>";
+						html += "		<div id='"+file+"-share' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='share-note share pointer'>";
+						if (filteredNotes[i].uid != currentUser) {
+							html += "	       <span class='share-owner pointer'>"+filteredNotes[i].uid+"</span>";
+						}
+						html += "			<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'></div>";
+						
+						html += "		</div>";
+						
+						html += "	</td>";
+						
+						html += "	<td class='info'>";
+//						html += "               <div class='owner'>"+filteredNotes[i].uid+"</div>";
+	
+						if (filteredNotes[i].timestring != '')
+							html += "		<div class='"+fileclass+"'>"+filteredNotes[i].timestring+"</div>";
+						else
+							html += "		<div class='"+fileclass+"'>"+trans("Just now")+"</div>";
+						html += "	</td>";
+						
+						html += "</tr>";
+					}
+				}
+				
+				html += "</table>";
+		
 		}
 		document.getElementById("ownnote").innerHTML = html;
 		$('#newfilename').css('color', '#A0A0A0');
@@ -408,7 +432,9 @@
 
 	function bindListing() {
 		$(".file").bind("click", editNote);
+		$(".share-note").bind("click", showSidebar);
 		$(".share-note").bind("click", shareNote);
+		$(".close").bind("click", hideSidebar);
 		$(".delete-note").bind("click", deleteNote);
 		$("#sortname").bind("click", sortName);
 		$("#sortmod").bind("click", sortMod);
@@ -483,7 +509,7 @@
 		if (active) a = " active";
 		if (name == "All" || name == "Not grouped" || name == "Shared with you" || name == "Shared with others") {
 			html += '<li class="group' + a + '" data-type="all">';
-			html += '	<a class="name nav-icon-sharingin svg" id="link-'+n+'" role="button" title="'+n+'">'+htmlQuotes(trans(name))+'</a>';
+			html += '	<a class="name" id="link-'+n+'" role="button" title="'+n+'">'+htmlQuotes(trans(name))+'</a>';
 		} else {
 			html += '<li id="group-'+n+'-edit" class="group editing">';
 			html += '	<ul class="oc-addnew open" style="display: inline-block; width: auto; height: auto;" aria-disabled="false">';
@@ -722,6 +748,7 @@
 		$.ajaxSetup ({ cache: false });
 		translate();
 		getSettings();
+		hideSidebar();
 		loadListing();
 	});
 	

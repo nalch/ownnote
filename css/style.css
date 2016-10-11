@@ -1,3 +1,31 @@
+#app-content.content-with-sidebar {
+	width: 60%;
+}
+
+#emptycontent, .emptycontent {
+    color: #888;
+    text-align: center;
+    margin-top: 30vh;
+    width: 100%;
+}
+
+#emptycontent [class^="icon-"], .emptycontent [class^="icon-"], #emptycontent [class*=" icon-"], .emptycontent [class*=" icon-"] {
+    background-size: 64px;
+    height: 64px;
+    width: 64px;
+    margin: 0 auto 15px;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    opacity: .4;
+}
+
+.icon-note, .icon-filetype-note {
+    background-image: url('../img/app-icon.svg');
+}
+
+#emptycontent h2, .emptycontent h2 {
+    margin-bottom: 10px;
+    line-height: 150%;
+}
 
 .listing {
 	height: 40pt;
@@ -10,12 +38,15 @@
 	line-height: 40pt;
 	white-space: nowrap;
 	padding: 0pt 15pt;
-	border-bottom: 1pt solid #EEE;
+	width: 100%;
+}
+
+.listingTable {
 	width: 100%;
 }
 
 .listingSort {
-	height: 40pt;
+	height: 54pt;
 	font-style: normal;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -25,8 +56,22 @@
 	line-height: 40pt;
 	white-space: nowrap;
 	padding: 0pt 15pt;
-	border-bottom: 1pt solid #EEE;
 	width: 100%;
+}
+
+.listingSort tr > td {
+	border-top: 1px solid #EEE;
+}
+
+.listingSort tr > td.file {
+}
+
+.listingSort tr > td.actions {
+	width: 30%;
+}
+
+.listingSort tr > td.info {
+	width: 15%;
 }
 
 .listingBlank {
@@ -52,20 +97,28 @@
 }
 
 .file {
-	float: left;
 	font-weight: bold;
-	width: 60%;
+	/*width: 60%;*/
 }
 
 .filesort {
-	float: left;
-	width: 60%;
+	/*width: 60%;*/
+}
+
+.actions {
+	padding-right: 15pt;
+}
+
+.actions .share-owner {
+	color: #A0A0A0;
+    display: inline-block;
+	float: right;
+	line-height: 26pt;
 }
 
 .info {
-	float: right;
 	color: #A0A0A0;
-	width: 30%;
+	/*width: 30%;*/
 }
 
 .modified {
@@ -74,17 +127,13 @@
 	width: 30%;
 }
 
-.owner {
-        color: #A0A0A0;
-        display: inline-block;
-        width: 30%;
-}
-
 .buttons {
-	float: right;
-	width: 10%;
 	background-repeat:no-repeat;
 	background-position: center center;
+	float: right;
+	height: 26pt;
+	margin-left: 15pt;
+	width: 26pt;	
 }
 
 .edit {
@@ -95,14 +144,13 @@
 	opacity: 1;
 }
 
-.share {
+.share .buttons {
 	background-image: url('../../../core/img/actions/share.png');
-        opacity: 0.3;
+    opacity: 0.3;
 }
 
-.share:hover {
-        background-image: url('../../../core/img/actions/shared.png');
-        opacity: 1;
+.share:hover > .buttons {
+    opacity: 1;
 }
 
 .delete {
@@ -111,7 +159,6 @@
 }
 
 .delete:hover {
-	background-image: url('../img/delete-hover.png');
 	opacity: 1;
 }
 
@@ -220,7 +267,6 @@
 
 [class^="icon-"], [class*=" icon-"], .action, .icon {
     background-repeat: no-repeat;
-    cursor: pointer;
 }
 
 #content li {

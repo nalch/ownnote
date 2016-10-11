@@ -1,22 +1,22 @@
 <?php
-
 \OCP\Util::addScript('ownnote', 'script');
-// OCP\Util::addScript('ownnote', 'sharetabview');
-\OCP\Util::addScript('ownnote','tinymce/tinymce.min');
+// \OCP\Util::addScript('files', 'detailtabview');
+// \OCP\Util::addScript('ownnote', 'sharetabview');
+\OCP\Util::addScript('ownnote', 'tinymce/tinymce.min');
 \OCP\Util::addStyle('ownnote', 'style');
 
-$disableAnnouncement = \OCP\Config::getAppValue('ownnote', 'disableAnnouncement', '');
-$l = OCP\Util::getL10N('ownnote');
+$disableAnnouncement = \OCP\Config::getAppValue ( 'ownnote', 'disableAnnouncement', '' );
+$l = OCP\Util::getL10N ('ownnote');
 
 $user = \OCP\User::getUser();
 
 $ocVersionArray = OCP\Util::getVersion();
 $ocVersion = "";
 $oci = 0;
-$ocl = sizeof($ocVersionArray);
-foreach ($ocVersionArray as $v) {
+$ocl = sizeof ($ocVersionArray);
+foreach ( $ocVersionArray as $v ) {
 	$ocVersion .= $v;
-	$oci++;
+	$oci ++;
 	if ($oci < $ocl)
 		$ocVersion .= ".";
 }
@@ -29,9 +29,67 @@ foreach ($ocVersionArray as $v) {
 	</div>
 	<div id="app-content">
 		<div id="ownnote"></div>
+		
+<!-- 			<div class="tabsContainer"> -->
+<!-- 				<div id="shareTabView" class="tab shareTabView"> -->
+<!-- 					<div> -->
+<!-- 						<div class="dialogContainer"> -->
+<!-- 							<div> -->
+<!-- 								<div class="resharerInfoView subView"> -->
+<!-- 									<span class="reshare"> -->
+<!-- 										<div class="avatar" data-username="nalch" -->
+<!-- 											style="height: 32px; width: 32px; color: rgb(255, 255, 255); font-weight: normal; text-align: center; line-height: 32px; font-size: 17.6px; background-color: rgb(116, 219, 231);">N</div> -->
+<!-- 										Von nalch mit Ihnen und der Gruppe admin geteilt. -->
+<!-- 									</span><br> -->
+<!-- 								</div> -->
+<!-- 								<label for="shareWith-view14" class="hidden-visually">Teilen</label> -->
+<!-- 								<div class="oneline"> -->
+<!-- 									<input id="shareWith-view14" -->
+<!-- 										class="shareWithField ui-autocomplete-input" type="text" -->
+<!-- 										placeholder="Mit Benutzern, Gruppen oder entfernten Benutzern teilen…" -->
+<!-- 										autocomplete="off"><span role="status" aria-live="polite" -->
+<!-- 										class="ui-helper-hidden-accessible"></span> <span -->
+<!-- 										class="shareWithLoading icon-loading-small hidden"></span><a -->
+<!-- 										target="_blank" -->
+<!-- 										class="icon-info svg shareWithRemoteInfo hasTooltip" -->
+<!-- 										href="https://doc.owncloud.org/server/9.1/go.php?to=user-sharing-federated" -->
+<!-- 										title="" -->
+<!-- 										data-original-title="Mit Benutzern anderer ownClouds unter Verwendung der Syntax benutzername@beispiel.com/owncloud teilen"></a> -->
+<!-- 								</div> -->
+<!-- 								<div class="shareeListView subView"> -->
+<!-- 									<ul id="shareWithList" class="shareWithList"></ul> -->
+<!-- 								</div> -->
+<!-- 								<div class="linkShareView subView"> -->
+<!-- 									<span class="icon-loading-small hidden"></span><input -->
+<!-- 										type="checkbox" name="linkCheckbox" id="linkCheckbox-view16" -->
+<!-- 										class="checkbox linkCheckbox" value="1"><label -->
+<!-- 										for="linkCheckbox-view16">Link teilen</label><br> -->
+<!-- 									<label for="linkText-view16" class="hidden-visually">Link</label><input -->
+<!-- 										id="linkText-view16" class="linkText hidden" type="text" -->
+<!-- 										readonly="readonly" value=""> -->
+<!-- 									<div id="linkPass" class="linkPass hidden"> -->
+<!-- 										<label for="linkPassText-view16" class="hidden-visually">Passwort</label> -->
+<!-- 										<input id="linkPassText-view16" class="linkPassText" -->
+<!-- 											type="password" -->
+<!-- 											placeholder="Wählen Sie ein Passwort für den öffentlichen Link"> -->
+<!-- 										<span class="icon-loading-small hidden"></span> -->
+<!-- 									</div> -->
+<!-- 								</div> -->
+<!-- 								<div class="expirationView subView"></div> -->
+<!-- 								<div class="mailView subView"></div> -->
+<!-- 								<div class="loading hidden" style="height: 50px"></div> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 			<a class="close icon-close" href="#" alt="Schließen"></a> -->
+		<div id="app-sidebar" class="detailsView scroll-container">
+			<a class="close icon-close" href="#" alt="Close"></a>		
+		</div>
 	</div>
-	<input type=hidden name="currentUser" id="currentUser" value="<?php echo $user; ?>">
-	<input type=hidden name="disableAnnouncement" id="disableAnnouncement" value="<?php echo $disableAnnouncement; ?>">
+	<input type="hidden" name="currentUser" id="currentUser" value="<?php echo $user; ?>">
+	<input type="hidden" name="disableAnnouncement" id="disableAnnouncement" value="<?php echo $disableAnnouncement; ?>">
 	<div id="ownnote-l10n">
 		l10n["# day ago"] = "<?php p($l->t("# day ago")); ?>";
 		l10n["# days ago"] = "<?php p($l->t("# days ago")); ?>";
@@ -48,6 +106,8 @@ foreach ($ocVersionArray as $v) {
 		l10n["# year ago"] = "<?php p($l->t("# year ago")); ?>";
 		l10n["# years ago"] = "<?php p($l->t("# years ago")); ?>";
 		l10n["All"] = "<?php p($l->t("All")); ?>";
+		l10n["You have no notes to display"] = "<?php p($l->t("You have no notes to display")); ?>";
+		l10n["Create new notes or let others share their notes with you"] = "<?php p($l->t("Create new notes or let others share their notes with you")); ?>";
 		l10n["An ungrouped file has the same name as a file in this group."] = "<?php p($l->t("An ungrouped file has the same name as a file in this group.")); ?>";
 		l10n["Cancel"] = "<?php p($l->t("Cancel")); ?>";
 		l10n["Create"] = "<?php p($l->t("Create")); ?>";
@@ -60,6 +120,8 @@ foreach ($ocVersionArray as $v) {
 		l10n["Name"] = "<?php p($l->t("Name")); ?>";
 		l10n["New"] = "<?php p($l->t("New")); ?>";
 		l10n["Not grouped"] = "<?php p($l->t("Not grouped")); ?>";
+		l10n["Shared with you"] = "<?php p($l->t("Shared with you")); ?>";
+		l10n["Shared with others"] = "<?php p($l->t("Shared with others")); ?>";
 		l10n["Note"] = "<?php p($l->t("Note")); ?>";
 		l10n["Notes"] = "<?php p($l->t("Notes")); ?>";
 		l10n["Quick Save"] = "<?php p($l->t("Quick Save")); ?>";
