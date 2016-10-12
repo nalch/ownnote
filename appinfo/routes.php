@@ -24,6 +24,7 @@ $application = new Application();
 $application->registerRoutes($this, array('routes' => array(
 	array('name' => 'page#index', 'url' => '/', 'verb' => 'GET'),
 	array('name' => 'ownnote_ajax#ajaxsetval', 'url' => '/ajax/v0.2/ajaxsetval', 'verb' => 'POST'),
+	array('name' => 'ownnote_ajax#ajaxgetsharemode', 'url' => '/ajax/v0.2/ajaxgetsharemode', 'verb' => 'GET'),
 	array('name' => 'ownnote_api#index', 'url' => '/api/v0.2/ownnote', 'verb' => 'GET'),
 	array('name' => 'ownnote_ajax#ajaxindex', 'url' => '/ajax/v0.2/ownnote/ajaxindex', 'verb' => 'GET'),
 	array('name' => 'ownnote_api#remoteindex', 'url' => '/api/v0.2/ownnote/remoteindex', 'verb' => 'GET'),
@@ -39,7 +40,7 @@ $application->registerRoutes($this, array('routes' => array(
 	array('name' => 'ownnote_api#del', 'url' => '/api/v0.2/ownnote/del', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxdel', 'url' => '/ajax/v0.2/ownnote/ajaxdel', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#share', 'url' => '/api/v0.2/ownnote/share', 'verb' => 'POST'),
-        array('name' => 'ownnote_ajax#ajaxshare', 'url' => '/ajax/v0.2/ownnote/ajaxshare', 'verb' => 'POST'),
+    array('name' => 'ownnote_ajax#ajaxshare', 'url' => '/ajax/v0.2/ownnote/ajaxshare', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#save', 'url' => '/api/v0.2/ownnote/save', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxsave', 'url' => '/ajax/v0.2/ownnote/ajaxsave', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#create', 'url' => '/api/v0.2/ownnote/create', 'verb' => 'POST'),
@@ -48,5 +49,5 @@ $application->registerRoutes($this, array('routes' => array(
 	array('name' => 'ownnote_ajax#ajaxdelgroup', 'url' => '/ajax/v0.2/ownnote/ajaxdelgroup', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#rengroup', 'url' => '/api/v0.2/ownnote/rengroup', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxrengroup', 'url' => '/ajax/v0.2/ownnote/ajaxrengroup', 'verb' => 'POST'),
-        array('name' => 'ownnote_api#preflighted_cors', 'url' => '/api/v0.2/{path}', 'verb' => 'OPTIONS', 'requirements' => array('path' => '.+')),
+    array('name' => 'ownnote_api#preflighted_cors', 'url' => '/api/v0.2/{path}', 'verb' => 'OPTIONS', 'requirements' => array('path' => '.+')),
 )));

@@ -276,6 +276,13 @@
 			return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
 		} 
 	}
+	
+	function computeDisplayname(note, currentUser) {
+		if (sharemode == 'merge') {
+			return note.group;
+		}
+		return (note.uid == currentUser) ? note.group : note.group + ' (' + note.uid + ')';
+	}
 
 	function buildListing() {
 		// filter the notes by group
@@ -295,7 +302,11 @@
 		        return note.uid == currentUser && note.shared_with.length > 0;
 		        break;			        
 		    default:
-		        return note.group == listingtype;
+		    	if (sharemode == 'merge') {
+		    		return note.group == listingtype;
+		    	} else {		    		
+		    		return listingtype == computeDisplayname(note, currentUser);
+		    	}
 			}
 		});
 
@@ -318,7 +329,7 @@
 			var c = filteredNotes.length;
 			if (c == 0) {
 				html += "<div id='emptycontent'>";
-				html += "	<div class='icon-note'></div>";
+				html += "	<div class='icon-filetype-text'></div>";
 				html += "	<h2>"+trans("You have no notes to display")+"</h2>";
 				html += "	<p class='uploadmessage'>"+trans("Create new notes or let others share their notes with you")+"</p>";
 				html += "</div>";
@@ -546,12 +557,9 @@
 		}
 	}
 
-	var groups = new Array();
-	var counts = new Array();
-
+	var groups = {};
 	function buildNav(a) {
-		groups.length = 0;
-		counts.length = 0;
+		groups = {};
 		var html = '';
 		var c = listing.length;
 		var uncat = 0;
@@ -562,11 +570,12 @@
 		
         for (i = 0; i < c; i++) {
 			if (listing[i].group != '') {
-				if ($.inArray(listing[i].group, groups) < 0) {
-					groups.push(listing[i].group);
-					counts.push(1);
+				var groupname = computeDisplayname(listing[i], currentUser);
+				
+				if (!(groupname in groups)) {
+					groups[groupname] = {name: listing[i].group, displayname: groupname, count: 1, owner: listing[i].uid};
 				} else {
-					counts[$.inArray(listing[i].group, groups)] += 1;
+					groups[groupname].count += 1;
 				}
 			} else {
 				uncat++;
@@ -586,14 +595,17 @@
 		html += buildNavItem("Shared with you", sharedin.length, a == "Shared with you", false);
 		html += buildNavItem("Shared with others", sharedout.length, a == "Shared with others", false);
 		
-		var gc = groups.length;
+		var groupnames = Object.keys(groups);
 		html += buildNavItem('All', c, a == "All");
-		if (gc > 0) {
+		if (groupnames.length > 0) {
 			html += buildNavItem('Not grouped', uncat, a == "Not grouped");
 		}
-        for (i = 0; i < gc; i++) {
-			html += buildNavItem(groups[i], counts[i], a == groups[i]);
-        }
+		
+		// build groups
+        $.each(groupnames, function (index, groupname) {
+        	var group = groups[groupname];
+        	html += buildNavItem(group.displayname, group.count, a == group.displayname, group.owner == currentUser);
+        });
         
 		html += "<div id='announcement-container'></div>";
 		$('#grouplist').html(html);
@@ -739,8 +751,10 @@
 		}
 	}
 
+	var sharemode = "merge";
 	var disableAnnouncement = "";
 	function getSettings() {
+		sharemode = $('#sharemode').val();
 		disableAnnouncement = $('#disableAnnouncement').val();
 	}
 

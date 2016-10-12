@@ -40,6 +40,10 @@ $TRANSLATIONS = array(
 "Database only" => "Nur Datenbank",
 "Disable announcements" => "Mitteilungen abschalten?",
 "How would you like to store your notes?" => "Wie möchten Sie Ihre Notizen speichern?",
+"How would you like to handle groups for shared notes?" => "Wie sollen geteilte Notizen in Gruppen eingeteilt werden?",
+"Synchronized" => "Synchronisiert",
+"Standalone" => "Separat",
+"Synchronized groups merge all shared notes, that have the same groupnames in the same group. Standalone groups get separate groups with their owner in the name. If 'UserA' shares a note in 'GroupX' with 'UserB', that also has a group called 'GroupX', 'Synchronized' will show them in the group 'GroupX' and 'Standalone' will show two groups 'GroupX' and 'GroupX (UserA)' for 'UserB'." => "Synchronisierte Gruppen beinhalten alle geteilten Notizen, die in gleich benannten Gruppen sind. Separate Gruppen beinhalten den Besitzer der Notizen als Suffix. Teilt 'NutzerA' eine Notiz der 'GruppeX' mit 'NutzerB', der ebenfalls eine 'GruppeX' besitzt, wird diese bei 'Synchronisiert' direkt in der Gruppe angezeigt. Bei 'Separat' werden die beiden Gruppen 'GruppeX' und 'GruppeX (NutzerA)' für 'NutzerB' angezeigt.",
 "Please enter the folder name you would like to use to store notes, with no slashes." => "Bitte den Verzeichnisnamen für das Speichern von Notizen eingeben, dieser darf keine Schrägstriche '/' enthalten.",
 "Would you like to disable announcements? (not recommended)" => "Möchten Sie die Mitteilungen ausschalten? (nicht empfohlen)"
 );

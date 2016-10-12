@@ -3,8 +3,11 @@
 // \OCP\Util::addScript('files', 'detailtabview');
 // \OCP\Util::addScript('ownnote', 'sharetabview');
 \OCP\Util::addScript('ownnote', 'tinymce/tinymce.min');
+\OCP\Util::addStyle('core', 'icons');
+\OCP\Util::addStyle('core', 'share');
 \OCP\Util::addStyle('ownnote', 'style');
 
+$sharemode = \OCP\Config::getAppValue('ownnote', 'sharemode', 'merge');
 $disableAnnouncement = \OCP\Config::getAppValue ( 'ownnote', 'disableAnnouncement', '' );
 $l = OCP\Util::getL10N ('ownnote');
 
@@ -29,67 +32,13 @@ foreach ( $ocVersionArray as $v ) {
 	</div>
 	<div id="app-content">
 		<div id="ownnote"></div>
-		
-<!-- 			<div class="tabsContainer"> -->
-<!-- 				<div id="shareTabView" class="tab shareTabView"> -->
-<!-- 					<div> -->
-<!-- 						<div class="dialogContainer"> -->
-<!-- 							<div> -->
-<!-- 								<div class="resharerInfoView subView"> -->
-<!-- 									<span class="reshare"> -->
-<!-- 										<div class="avatar" data-username="nalch" -->
-<!-- 											style="height: 32px; width: 32px; color: rgb(255, 255, 255); font-weight: normal; text-align: center; line-height: 32px; font-size: 17.6px; background-color: rgb(116, 219, 231);">N</div> -->
-<!-- 										Von nalch mit Ihnen und der Gruppe admin geteilt. -->
-<!-- 									</span><br> -->
-<!-- 								</div> -->
-<!-- 								<label for="shareWith-view14" class="hidden-visually">Teilen</label> -->
-<!-- 								<div class="oneline"> -->
-<!-- 									<input id="shareWith-view14" -->
-<!-- 										class="shareWithField ui-autocomplete-input" type="text" -->
-<!-- 										placeholder="Mit Benutzern, Gruppen oder entfernten Benutzern teilen…" -->
-<!-- 										autocomplete="off"><span role="status" aria-live="polite" -->
-<!-- 										class="ui-helper-hidden-accessible"></span> <span -->
-<!-- 										class="shareWithLoading icon-loading-small hidden"></span><a -->
-<!-- 										target="_blank" -->
-<!-- 										class="icon-info svg shareWithRemoteInfo hasTooltip" -->
-<!-- 										href="https://doc.owncloud.org/server/9.1/go.php?to=user-sharing-federated" -->
-<!-- 										title="" -->
-<!-- 										data-original-title="Mit Benutzern anderer ownClouds unter Verwendung der Syntax benutzername@beispiel.com/owncloud teilen"></a> -->
-<!-- 								</div> -->
-<!-- 								<div class="shareeListView subView"> -->
-<!-- 									<ul id="shareWithList" class="shareWithList"></ul> -->
-<!-- 								</div> -->
-<!-- 								<div class="linkShareView subView"> -->
-<!-- 									<span class="icon-loading-small hidden"></span><input -->
-<!-- 										type="checkbox" name="linkCheckbox" id="linkCheckbox-view16" -->
-<!-- 										class="checkbox linkCheckbox" value="1"><label -->
-<!-- 										for="linkCheckbox-view16">Link teilen</label><br> -->
-<!-- 									<label for="linkText-view16" class="hidden-visually">Link</label><input -->
-<!-- 										id="linkText-view16" class="linkText hidden" type="text" -->
-<!-- 										readonly="readonly" value=""> -->
-<!-- 									<div id="linkPass" class="linkPass hidden"> -->
-<!-- 										<label for="linkPassText-view16" class="hidden-visually">Passwort</label> -->
-<!-- 										<input id="linkPassText-view16" class="linkPassText" -->
-<!-- 											type="password" -->
-<!-- 											placeholder="Wählen Sie ein Passwort für den öffentlichen Link"> -->
-<!-- 										<span class="icon-loading-small hidden"></span> -->
-<!-- 									</div> -->
-<!-- 								</div> -->
-<!-- 								<div class="expirationView subView"></div> -->
-<!-- 								<div class="mailView subView"></div> -->
-<!-- 								<div class="loading hidden" style="height: 50px"></div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-<!-- 					</div> -->
-<!-- 				</div> -->
-<!-- 			</div> -->
-<!-- 			<a class="close icon-close" href="#" alt="Schließen"></a> -->
 		<div id="app-sidebar" class="detailsView scroll-container">
 			<a class="close icon-close" href="#" alt="Close"></a>		
 		</div>
 	</div>
-	<input type="hidden" name="currentUser" id="currentUser" value="<?php echo $user; ?>">
-	<input type="hidden" name="disableAnnouncement" id="disableAnnouncement" value="<?php echo $disableAnnouncement; ?>">
+	<input type="hidden" name="currentUser" id="currentUser" value="<?php echo $user; ?>"/>
+	<input type="hidden" name="sharemode" id="sharemode" value="<?php echo $sharemode; ?>"/>
+	<input type="hidden" name="disableAnnouncement" id="disableAnnouncement" value="<?php echo $disableAnnouncement; ?>"/>
 	<div id="ownnote-l10n">
 		l10n["# day ago"] = "<?php p($l->t("# day ago")); ?>";
 		l10n["# days ago"] = "<?php p($l->t("# days ago")); ?>";

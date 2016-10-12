@@ -136,4 +136,12 @@ class OwnnoteAjaxController extends ApiController {
 	public function ajaxsetval($field, $value) {
 		return $this->backend->setAdminVal($field, $value);
 	}
+	
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 */
+	public function ajaxgetsharemode() {
+		return \OCP\Config::getAppValue('ownnote', 'sharemode', '');
+	}
 }
