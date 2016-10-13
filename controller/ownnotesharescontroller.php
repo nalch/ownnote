@@ -49,6 +49,8 @@ class OwnnoteSharesController extends ApiController {
 	 * @NoCSRFRequired
 	 */
 	public function unshare($itemSource, $shareType, $shareWith) {
+		\OCP\Util::writeLog('ownnote', 'aeoieoiaoe', \OCP\Util::ERROR);
+		\OCP\Util::writeLog('ownnote', $itemSource.'/'.$shareType.'/'.$shareWith, \OCP\Util::ERROR);
 		return \OCP\Share::unshare('ownnote', intval($itemSource), intval($shareType), $shareWith);
 	}
 }

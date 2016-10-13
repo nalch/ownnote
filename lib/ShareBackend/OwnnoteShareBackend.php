@@ -62,7 +62,6 @@ class OwnnoteShareBackend implements Share_Backend {
 	 * @since 5.0.0
 	 */
 	public function formatItems($items, $format, $parameters = null) {
-		
 		if ($format === 'shares') {
 			return $items;
 		}
