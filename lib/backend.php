@@ -147,7 +147,6 @@ class Backend {
 		
 		// Get shares
 		$shared_items = \OCP\Share::getItemsSharedWith('ownnote', 42);
-		\OCP\Util::writeLog('ownnote', "shares: ".print_r(count($shared_items), true), \OCP\Util::ERROR);
 		
 		return array_merge($results, $shared_items);		
 	}
@@ -359,17 +358,6 @@ class Backend {
 		}
 		return $ret;
 	}
-
-	public function shareNote($FOLDER, $name, $group, $user) {
-		// get note
-		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping FROM *PREFIX*ownnote WHERE name=? and grouping=?");
-                $results = $query->execute(Array($name, $group))->fetchAll();
-		$note = $results[0];
-		
-		\OCP\Util::writeLog('ownnote', "share ".print_r($note['uid'], true)."'s ".print_r($note['name']."(".$note['id'].")", true)." with ".print_r($user, true), \OCP\Util::ERROR);
-		$ret_val = \OCP\Share::shareItem('ownnote', $note['id'], \OCP\SHARE::SHARE_TYPE_USER, $user, \OCP\Constants::PERMISSION_ALL);
-		return "DONE";
-    }
 
 	public function deleteNote($FOLDER, $name, $group) {
 		$now = new DateTime();

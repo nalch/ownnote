@@ -1,17 +1,15 @@
 <?php
 \OCP\Util::addScript('ownnote', 'script');
-// \OCP\Util::addScript('files', 'detailtabview');
-// \OCP\Util::addScript('ownnote', 'sharetabview');
+\OCP\Util::addScript('ownnote', 'ownnote');
+\OCP\Util::addScript('ownnote', 'share');
 \OCP\Util::addScript('ownnote', 'tinymce/tinymce.min');
 \OCP\Util::addStyle('core', 'icons');
-\OCP\Util::addStyle('core', 'share');
+\OCP\Util::addStyle('gallery', 'share');
 \OCP\Util::addStyle('ownnote', 'style');
 
 $sharemode = \OCP\Config::getAppValue('ownnote', 'sharemode', 'merge');
 $disableAnnouncement = \OCP\Config::getAppValue ( 'ownnote', 'disableAnnouncement', '' );
 $l = OCP\Util::getL10N ('ownnote');
-
-$user = \OCP\User::getUser();
 
 $ocVersionArray = OCP\Util::getVersion();
 $ocVersion = "";
@@ -32,11 +30,8 @@ foreach ( $ocVersionArray as $v ) {
 	</div>
 	<div id="app-content">
 		<div id="ownnote"></div>
-		<div id="app-sidebar" class="detailsView scroll-container">
-			<a class="close icon-close" href="#" alt="Close"></a>		
-		</div>
 	</div>
-	<input type="hidden" name="currentUser" id="currentUser" value="<?php echo $user; ?>"/>
+	
 	<input type="hidden" name="sharemode" id="sharemode" value="<?php echo $sharemode; ?>"/>
 	<input type="hidden" name="disableAnnouncement" id="disableAnnouncement" value="<?php echo $disableAnnouncement; ?>"/>
 	<div id="ownnote-l10n">

@@ -46,25 +46,6 @@
 			return s;
 	}
 
-	function showSidebar() {
-		$('#app-content').addClass('content-with-sidebar');
-        $('#app-sidebar').show();
-	}
-	
-	function hideSidebar() {
-		$('#app-content').removeClass('content-with-sidebar');
-        $('#app-sidebar').hide();
-	}
-	
-    function shareNote(id) {
-        var n = $(this).attr('n');
-        var g = $(this).attr('g');
-        var user = 'nalch';
-        $.post(ocUrl("ajax/v0.2/ownnote/ajaxshare"), { name: n, group: g, user: user }, function (data) {			
-                loadListing();
-        });
-    }
-
 	function deleteNote(id) {
 		var n = $(this).attr('n');
 		var g = $(this).attr('g');
@@ -277,35 +258,34 @@
 		} 
 	}
 	
-	function computeDisplayname(note, currentUser) {
+	function computeDisplayname(note) {
 		if (sharemode == 'merge') {
 			return note.group;
 		}
-		return (note.uid == currentUser) ? note.group : note.group + ' (' + note.uid + ')';
+		return (note.uid == OC.currentUser) ? note.group : note.group + ' (' + note.uid + ')';
 	}
 
 	function buildListing() {
 		// filter the notes by group
-		var currentUser = document.getElementById("currentUser").value;
 		filteredNotes = listing.filter(function(note) {
 			switch(listingtype) {
 		    case 'All':
 		        return true;
 		        break;
 		    case 'Not grouped':
-		        return note.group == '';
+		        return note.group === '';
 		        break;
 		    case 'Shared with you':
-		        return $.inArray(currentUser, note.shared_with) != -1;
+		    	return note.uid !== OC.currentUser;
 		        break;
 		    case 'Shared with others':
-		        return note.uid == currentUser && note.shared_with.length > 0;
+		        return note.uid == OC.currentUser && note.shared_with.length > 0;
 		        break;			        
 		    default:
-		    	if (sharemode == 'merge') {
-		    		return note.group == listingtype;
+		    	if (sharemode === 'merge') {
+		    		return note.group === listingtype;
 		    	} else {		    		
-		    		return listingtype == computeDisplayname(note, currentUser);
+		    		return listingtype === computeDisplayname(note);
 		    	}
 			}
 		});
@@ -397,17 +377,20 @@
 						html += "	<td class='actions'>";
 						html += "		<div id='"+file+"-delete' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'></div>";
 						html += "		<div id='"+file+"-share' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='share-note share pointer'>";
-						if (filteredNotes[i].uid != currentUser) {
+						html += "		<a class='share' data-item-type='ownnote' data-item="+filteredNotes[i].id+" data-possible-permissions='31' data-path='"+filteredNotes[i].id+"'>";
+						if (filteredNotes[i].uid != OC.currentUser) {
 							html += "	       <span class='share-owner pointer'>"+filteredNotes[i].uid+"</span>";
+						} else if (filteredNotes[i].shared_with.length > 0) {
+							html += "	       <span class='share-owner pointer'>"+trans("Shared")+"</span>";
 						}
 						html += "			<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'></div>";
+						html += "		</a>";
 						
 						html += "		</div>";
 						
 						html += "	</td>";
 						
 						html += "	<td class='info'>";
-//						html += "               <div class='owner'>"+filteredNotes[i].uid+"</div>";
 	
 						if (filteredNotes[i].timestring != '')
 							html += "		<div class='"+fileclass+"'>"+filteredNotes[i].timestring+"</div>";
@@ -432,9 +415,9 @@
 		var $select = $('select#groupname');
 		$select.append($('<option value="">Not grouped</option>'));
 		$select.append($('<option>').attr('value', '_new').text('New group'));
-		$(groups).each(function(i, group) {
-			var option = $('<option>').attr('value', group).text(group);
-			if(group == current) {
+		$.each(groups, function(groupname, group) {
+			var option = $('<option>').attr('value', group.displayname).text(group.displayname);
+			if(group.displayname == current) {
 				option.attr('selected', 'selected');
 			}
 			$select.append(option);
@@ -443,9 +426,6 @@
 
 	function bindListing() {
 		$(".file").bind("click", editNote);
-		$(".share-note").bind("click", showSidebar);
-		$(".share-note").bind("click", shareNote);
-		$(".close").bind("click", hideSidebar);
 		$(".delete-note").bind("click", deleteNote);
 		$("#sortname").bind("click", sortName);
 		$("#sortmod").bind("click", sortMod);
@@ -564,13 +544,12 @@
 		var c = listing.length;
 		var uncat = 0;
 		
-		var currentUser = document.getElementById("currentUser").value;
 		var sharedin = new Array();
 		var sharedout = new Array();
 		
         for (i = 0; i < c; i++) {
 			if (listing[i].group != '') {
-				var groupname = computeDisplayname(listing[i], currentUser);
+				var groupname = computeDisplayname(listing[i]);
 				
 				if (!(groupname in groups)) {
 					groups[groupname] = {name: listing[i].group, displayname: groupname, count: 1, owner: listing[i].uid};
@@ -581,11 +560,11 @@
 				uncat++;
 			}
 			// shared with you
-			if (listing[i].uid !== currentUser) {
+			if (listing[i].uid !== OC.currentUser) {
 				sharedin.push(listing[i].id);
 			}
 			// shared with others
-			if (listing[i].uid === currentUser && listing[i].shared_with.length > 0) {
+			if (listing[i].uid === OC.currentUser && listing[i].shared_with.length > 0) {
 				sharedout.push(listing[i].id);
 			}
 		}
@@ -604,7 +583,7 @@
 		// build groups
         $.each(groupnames, function (index, groupname) {
         	var group = groups[groupname];
-        	html += buildNavItem(group.displayname, group.count, a == group.displayname, group.owner == currentUser);
+        	html += buildNavItem(group.displayname, group.count, a == group.displayname, group.owner == OC.currentUser);
         });
         
 		html += "<div id='announcement-container'></div>";
@@ -762,7 +741,6 @@
 		$.ajaxSetup ({ cache: false });
 		translate();
 		getSettings();
-		hideSidebar();
 		loadListing();
 	});
 	
