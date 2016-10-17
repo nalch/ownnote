@@ -45,6 +45,7 @@ $application->registerRoutes($this, array('routes' => array(
 	array('name' => 'ownnote_shares#getshares', 'url' => '/api/v0.2/ownnote/shares', 'verb' => 'GET'),
 	array('name' => 'ownnote_shares#share', 'url' => '/api/v0.2/ownnote/shares', 'verb' => 'POST'),
 	array('name' => 'ownnote_shares#unshare', 'url' => '/api/v0.2/ownnote/shares/{itemSource}', 'verb' => 'DELETE', 'requirements' => array('itemSource' => '.+')),
+	array('name' => 'ownnote_shares#setpermissions', 'url' => '/api/v0.2/ownnote/shares/{itemSource}/permissions', 'verb' => 'PUT', 'requirements' => array('itemSource' => '.+')),
 	
 	array('name' => 'ownnote_api#save', 'url' => '/api/v0.2/ownnote/save', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxsave', 'url' => '/ajax/v0.2/ownnote/ajaxsave', 'verb' => 'POST'),
