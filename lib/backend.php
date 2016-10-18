@@ -8,8 +8,6 @@ namespace OCA\OwnNote\Lib;
 use DateTime;
 use DOMDocument;
 
-use \OCP\Constants\PERMISSION_ALL;
-
 class Backend {
 
 	private $userManager;
@@ -146,9 +144,9 @@ class Backend {
 		$results = $query->execute(Array($uid))->fetchAll();
 		
 		// Get shares
-		$shared_items = \OCP\Share::getItemsSharedWith('ownnote', 42);
+		$shared_items = \OCP\Share::getItemsSharedWith('ownnote', 'populated_shares');
 		
-		return array_merge($results, $shared_items);		
+		return array_merge($results, $shared_items);
 	}
 
 	public function getListing($FOLDER, $showdel) {
@@ -305,6 +303,7 @@ class Backend {
 					$f['mtime'] = $result['mtime'];
 					$f['timediff'] = $now->getTimestamp()-$result['mtime'];
 					$f['deleted'] = $result['deleted'];
+					$f['permissions'] = $result['permissions'];
 					
 					$shared_with = \OCP\Share::getUsersItemShared('ownnote', $result['id'], $result['uid']);
 					// add shares (all shares, if it's an owned note, only the user for shared notes (not disclosing other sharees))

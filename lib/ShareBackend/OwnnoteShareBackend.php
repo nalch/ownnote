@@ -38,7 +38,7 @@ class OwnnoteShareBackend implements Share_Backend {
 		// note id (should be unique)
 		return $itemSource;
 	}
-	
+
 	/**
 	 * Converts the shared item sources back into the item in the specified format
 	 * @param array $items Shared items
@@ -75,9 +75,18 @@ class OwnnoteShareBackend implements Share_Backend {
 		// get notes from database
 		$select_clause = "SELECT id, uid, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE id in (";
 		$select_clause .= implode(',', $ids);
-		$select_clause .= ") ORDER BY name";
+		$select_clause .= ") ORDER BY id";
 		$query = \OCP\DB::prepare($select_clause);
 		$results = $query->execute(Array())->fetchAll();
+
+		// add permissions to items
+		if ($format === 'populated_shares') {
+			$full_items = Array();
+			foreach($results as $index => $result) {
+				$full_items[] = array_merge($items[$index], $result);
+			}
+			$results = $full_items;
+		}
 		
 		return $results;
 	}

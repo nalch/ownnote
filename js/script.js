@@ -375,7 +375,13 @@
 						html += "	<td id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</td>";
 						
 						html += "	<td class='actions'>";
-						html += "		<div id='"+file+"-delete' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'></div>";
+						
+						// delete
+						if (filteredNotes[i].uid === OC.currentUser || (filteredNotes[i].permissions & OC.PERMISSION_DELETE)) {
+							html += "		<div id='"+file+"-delete' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'></div>";
+						}
+						
+						// share
 						html += "		<div id='"+file+"-share' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='share-note share pointer'>";
 						html += "		<a class='share' data-item-type='ownnote' data-item="+filteredNotes[i].id+" data-possible-permissions='31' data-path='"+filteredNotes[i].id+"'>";
 						if (filteredNotes[i].uid != OC.currentUser) {

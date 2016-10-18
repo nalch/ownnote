@@ -1,10 +1,14 @@
-/* global OwnNote */
+/* global Ownnote */
 (function ($, OC, t) {
 	"use strict";
+	
 	var Ownnote = {
 		config: {},
-		/** Map of the whole Ownnote, built as we navigate through folders */
-		appName: 'ownnote',
+		appName: 'ownnote',		
 	}
+	
 	window.Ownnote = Ownnote;
 })(jQuery, OC, t);
+
+$(document).ready(function() {
+});
