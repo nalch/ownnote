@@ -235,6 +235,10 @@
 	font-weight: bold;
 }
 
+.mceNonEditable {
+	padding: 10px;
+}
+
 #app-navigation .active {
     font-weight: bold;
 }
