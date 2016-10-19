@@ -108,7 +108,7 @@
 		html += "			<input type='hidden' id='originalfilename' value='"+name+"'>";
 		html += "			<input type='hidden' id='originalgroup' value='"+group+"'>";
 		html += "			<input type='hidden' id='groupname' value='"+group+"'>";
-		if (p & OC.PERMISSION_UPDATE) {
+		if (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE)) {
 			html += "			<div id='quicksave' class='button'>"+trans("Quick Save")+"</div>";
 			html += "			<div id='save' class='button'>"+trans("Save")+"</div>";
 		}
@@ -117,7 +117,8 @@
 		html += "	</div>";
 		html += "</div>";
 		html += "<div class='listingBlank'><!-- --></div>";
-		html += "<div id='editable' class='editable'>";
+		var editableClass = (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE)) ? 'editable' : 'mceNonEditable';
+		html += "<div id='editable' class='"+editableClass+"'>";
 		html += data;
 		html += "</div>";
 		document.getElementById("ownnote").innerHTML = html;
