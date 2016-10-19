@@ -5,7 +5,7 @@
 			menubar: false,
 			plugins: [
 				"advlist autolink lists link charmap print preview anchor",
-				"searchreplace visualblocks code fullscreen",
+				"searchreplace visualblocks code fullscreen noneditable",
 				"insertdatetime media table contextmenu bdesk_photo autoresize"
 			],
 			extended_valid_elements: "form[name|id|action|method|enctype|accept-charset|onsubmit|onreset|target],input[id|name|type|value|size|maxlength|checked|accept|src|width|height|disabled|readonly|tabindex|accesskey|onfocus|onblur|onchange|onselect|onclick|onkeyup|onkeydown|required|style],textarea[id|name|rows|cols|maxlength|disabled|readonly|tabindex|accesskey|onfocus|onblur|onchange|onselect|onclick|onkeyup|onkeydown|required|style],option[name|id|value|selected|style],select[id|name|type|value|size|maxlength|checked|width|height|disabled|readonly|tabindex|accesskey|onfocus|onblur|onchange|onselect|onclick|multiple|style]",
@@ -17,6 +17,7 @@
   			height: h-130,
 			autoresize_min_height: h-130,
 			autoresize_max_height: h-130,
+			noneditable_editable_class: "editable",
 			init_instance_callback : function(editor) {
 				resizeFont("13");
 				startTimer();
@@ -55,10 +56,13 @@
 	}
 
 	function editNote(id) {
+		var id = $(this).attr('i');
+		var uid = $(this).attr('uid');
 		var n = $(this).attr('n');
 		var g = $(this).attr('g');
+		var p = $(this).attr('p');
 		$.post(ocUrl("ajax/v0.2/ownnote/ajaxedit"), { name: n, group: g }, function (data) {
-			buildEdit(n, g, data);
+			buildEdit(i, uid, n, g, p, data);
 		});
 	}
 
@@ -81,7 +85,7 @@
 		h = $(window).height() - o.top;
 	}
 
-	function buildEdit(n, g, data) {
+	function buildEdit(id, uid, n, g, p, data) {
 		resizeContainer();
 		var name = htmlQuotes(n);
 		var group = htmlQuotes(g);
@@ -89,13 +93,25 @@
 		html += "<div id='controls'>";
 		html += "	<div id='newfile' class='indent'>";
 		html += "		<form id='editform' class='note-title-form'>";
-		html += "			"+trans("Name")+": <input type='text' class='fileinput' id='editfilename' value='"+name+"'>";
-		html += "			&nbsp;&nbsp;"+trans("Group")+": <select id='groupname'></select>";
-		html += "			<input type='text' class='newgroupinput' id='newgroupname' placeholder='group title'>";
+		if (uid === OC.currentUser) {
+			html += "			"+trans("Name")+": <input type='text' class='fileinput' id='editfilename' value='"+name+"'>";
+			html += "			&nbsp;&nbsp;"+trans("Group")+": <select id='groupname'></select>";
+			html += "			<input type='text' class='newgroupinput' id='newgroupname' placeholder='group title'>";
+		} else {
+			html += "			"+trans("Name")+": <span class='bold'>"+n+"</span>";
+			if (g !== "") {
+				html += "			&nbsp;&nbsp;"+trans("Group")+": <span class='bold'>"+g+"</span>";
+			}
+			html += "			<input type='hidden' class='fileinput' id='editfilename' value='"+name+"'/>";
+			html += "			<input type='hidden' class='newgroupinput' id='newgroupname'/>";
+		}
 		html += "			<input type='hidden' id='originalfilename' value='"+name+"'>";
 		html += "			<input type='hidden' id='originalgroup' value='"+group+"'>";
-		html += "			<div id='quicksave' class='button'>"+trans("Quick Save")+"</div>";
-		html += "			<div id='save' class='button'>"+trans("Save")+"</div>";
+		html += "			<input type='hidden' id='groupname' value='"+group+"'>";
+		if (p & OC.PERMISSION_UPDATE) {
+			html += "			<div id='quicksave' class='button'>"+trans("Quick Save")+"</div>";
+			html += "			<div id='save' class='button'>"+trans("Save")+"</div>";
+		}
 		html += "			<div id='canceledit' class='button'>"+trans("Cancel")+"</div>";
 		html += "		</form>";
 		html += "	</div>";
@@ -372,7 +388,7 @@
 						if (filteredNotes[i].timediff < 30)
 							fileclass = 'modified latestfile';
 						html += "<tr class='listing'>";
-						html += "	<td id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' class='file pointer'>"+name+"</td>";
+						html += "	<td id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' title='"+name+"' p='"+filteredNotes[i].permissions+"' uid='"+filteredNotes[i].uid+"' class='file pointer'>"+name+"</td>";
 						
 						html += "	<td class='actions'>";
 						

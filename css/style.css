@@ -231,6 +231,10 @@
     height: 44px;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 #app-navigation .active {
     font-weight: bold;
 }
