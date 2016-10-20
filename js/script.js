@@ -47,10 +47,9 @@
 			return s;
 	}
 
-	function deleteNote(id) {
-		var n = $(this).attr('n');
-		var g = $(this).attr('g');
-		$.post(ocUrl("ajax/v0.2/ownnote/ajaxdel"), { name: n, group: g }, function (data) {
+	function deleteNote(event) {
+		var nid = $(this).attr('i');
+		$.post(ocUrl("ajax/v0.2/ownnote/ajaxdel"), { nid: nid }, function (data) {
 			loadListing();
 		});
 	}

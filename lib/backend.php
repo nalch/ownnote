@@ -325,8 +325,8 @@ class Backend {
 		$fileindb = false;
 		$filedeldb = false;
 		$ret = -1;
-		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE name=? and grouping=?");
-		$results = $query->execute(Array($name, $group))->fetchAll();
+		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping, mtime, deleted FROM *PREFIX*ownnote WHERE name=? and grouping=? and uid=?");
+		$results = $query->execute(Array($name, $group, $uid))->fetchAll();
 		foreach($results as $result)
 			if ($result['deleted'] == 0) {
 				$fileindb = true;
@@ -335,8 +335,8 @@ class Backend {
 				$filedeldb = true;
 			}
 		if ($filedeldb) {
-			$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote WHERE name=? and grouping=?");
-			$results = $query->execute(Array($name, $group));
+			$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote WHERE name=? and grouping=? and uid=?");
+			$results = $query->execute(Array($name, $group, $uid));
 		}
 		// new note
 		if (! $fileindb) {
@@ -352,24 +352,23 @@ class Backend {
 				}
 			}
 			$query = \OCP\DB::prepare("INSERT INTO *PREFIX*ownnote (uid, name, grouping, mtime, note, shared) VALUES (?,?,?,?,?,?)");
-			$query->execute(Array($uid,$name,$group,$mtime,'',''));
+			$query->execute(Array($uid, $name, $group, $mtime, '', ''));
 			$ret = \OCP\DB::insertid('*PREFIX*ownnote');
 		}
 		return $ret;
 	}
 
-	public function deleteNote($FOLDER, $name, $group) {
+	public function deleteNote($FOLDER, $nid) {
+		if (!$this->checkPermissions(\OCP\Constants::PERMISSION_DELETE, $nid)) {
+			return false;
+		}
 		$now = new DateTime();
 		$mtime = $now->getTimestamp();
 		$uid = \OCP\User::getUser();
-		$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', deleted=1, mtime=? WHERE uid=? and name=? and grouping=?");
-		$results = $query->execute(Array($mtime, $uid, $name, $group));
-		$query = \OCP\DB::prepare("SELECT id FROM *PREFIX*ownnote WHERE uid=? and name=? and grouping=?");
-		$results = $query->execute(Array($uid, $name, $group))->fetchAll();
-		foreach($results as $result) {
-			$query2 = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote_parts WHERE id=?");
-			$results2 = $query2->execute(Array($result['id']));
-		}
+		$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', deleted=1, mtime=? WHERE id=?");
+		$results = $query->execute(Array($mtime, $nid));
+		$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote_parts WHERE id=?");
+		$query->execute(Array($nid));
 		if ($FOLDER != '') {
 			$tmpfile = $FOLDER."/".$name.".htm";
 			if ($group != '')
@@ -377,7 +376,7 @@ class Backend {
 			if (\OC\Files\Filesystem::file_exists($tmpfile))
 				\OC\Files\Filesystem::unlink($tmpfile);
 		}
-		return "DONE";
+		return true;
 	}
 
 
@@ -437,10 +436,11 @@ class Backend {
 		$newgroup = str_replace("\\", "-", str_replace("/", "-", $in_newgroup));
 		// We actually need to delete and create so that the delete flag exists for syncing clients
 		$content = $this->editNote($name, $group);
-		$this->deleteNote($FOLDER, $name, $group);
+		$this->deleteNote($FOLDER, $nid);
 		$this->createNote($FOLDER, $newname, $newgroup);
 		// BUG: Don't need createNote above?
 		$this->saveNote($FOLDER, $newname, $newgroup, $content, 0);
+		// the DONE is used in javascript
 		return "DONE";
 	}
 
@@ -452,7 +452,6 @@ class Backend {
 		foreach($results as $result) {
 			$this->renameNote($FOLDER, $result['name'], $group, $result['name'], '');
 		}
-		return "DONE";
 	}
 
 	public function renameGroup($FOLDER, $group, $newgroup) {
@@ -462,6 +461,7 @@ class Backend {
 		foreach($results as $result) {
 			$this->renameNote($FOLDER, $result['name'], $group, $result['name'], $newgroup);
 		}
+		// the DONE is used in javascript
 		return "DONE";
 	}
 
@@ -475,6 +475,18 @@ class Backend {
 
 	public function setAdminVal($option, $value) {
 		\OCP\Config::setAppValue('ownnote', $option, $value);
+	}
+	
+	private function checkPermissions($permission, $nid) {
+		// gather information
+		$shared_note = \OCP\Share::getItemSharedWith('ownnote', $nid, 'populated_shares')[0];
+		
+		// owner is allowed to change everything
+		if ($uid === $note.uid) {
+			return true;
+		}
+		
+		return $shared_note.permissions & $permission;
 	}
 }
 

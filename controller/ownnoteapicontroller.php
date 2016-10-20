@@ -77,10 +77,10 @@ class OwnnoteApiController extends ApiController {
 	* @NoAdminRequired
 	* @NoCSRFRequired
 	*/
-	public function del($name, $group) {
+	public function del($nid) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($name) && isset($group))
-			return $this->backend->deleteNote($FOLDER, $name, $group);
+		if (isset($nid))
+			return $this->backend->deleteNote($FOLDER, $nid);
 	}
 
 	/**

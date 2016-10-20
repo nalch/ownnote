@@ -74,10 +74,10 @@ class OwnnoteAjaxController extends ApiController {
 	/**
 	* @NoAdminRequired
 	*/
-	public function ajaxdel($name, $group) {
+	public function ajaxdel($nid) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($name) && isset($group))
-			return $this->backend->deleteNote($FOLDER, $name, $group);
+		if (isset($nid))
+			return $this->backend->deleteNote($FOLDER, $nid);
 	}
 
 	/**
