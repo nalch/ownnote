@@ -33,6 +33,7 @@ $application->registerRoutes($this, array('routes' => array(
 	array('name' => 'ownnote_ajax#ajaxannouncement', 'url' => '/ajax/v0.2/ownnote/ajaxannouncement', 'verb' => 'GET'),
 	array('name' => 'ownnote_api#version', 'url' => '/api/v0.2/ownnote/version', 'verb' => 'GET'),
 	array('name' => 'ownnote_ajax#ajaxversion', 'url' => '/ajax/v0.2/ownnote/ajaxversion', 'verb' => 'GET'),
+	
 	array('name' => 'ownnote_api#ren', 'url' => '/api/v0.2/ownnote/ren', 'verb' => 'POST'),
 	array('name' => 'ownnote_ajax#ajaxren', 'url' => '/ajax/v0.2/ownnote/ajaxren', 'verb' => 'POST'),
 	array('name' => 'ownnote_api#edit', 'url' => '/api/v0.2/ownnote/edit', 'verb' => 'POST'),

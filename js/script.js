@@ -55,13 +55,13 @@
 	}
 
 	function editNote(id) {
-		var id = $(this).attr('i');
+		var nid = $(this).attr('i');
 		var uid = $(this).attr('uid');
 		var n = $(this).attr('n');
 		var g = $(this).attr('g');
 		var p = $(this).attr('p');
-		$.post(ocUrl("ajax/v0.2/ownnote/ajaxedit"), { name: n, group: g }, function (data) {
-			buildEdit(i, uid, n, g, p, data);
+		$.post(ocUrl("ajax/v0.2/ownnote/ajaxedit"), { nid: nid }, function (data) {
+			buildEdit(nid, uid, n, g, p, data);
 		});
 	}
 
@@ -106,6 +106,7 @@
 		}
 		html += "			<input type='hidden' id='originalfilename' value='"+name+"'>";
 		html += "			<input type='hidden' id='originalgroup' value='"+group+"'>";
+		html += "			<input type='hidden' id='originalid' value='"+id+"'>";
 		html += "			<input type='hidden' id='groupname' value='"+group+"'>";
 		if (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE)) {
 			html += "			<div id='quicksave' class='button'>"+trans("Quick Save")+"</div>";
@@ -187,6 +188,7 @@
 		var editgroup = $('#groupname').val();
 		var originalfilename = $('#originalfilename').val();
 		var originalgroup = $('#originalgroup').val();
+		var originalid = $('#originalid').val();
 		var content = tinymce.activeEditor.getContent();
 		if (editgroup.toLowerCase() == "all" || editgroup.toLowerCase() == "not grouped") {
 			editgroup = "";
@@ -194,6 +196,8 @@
 			$('#newgroupname').val($('#newgroupname').val().replace(/\\/g, '-').replace(/\//g, '-'));
 			editgroup = $('#newgroupname').val();
 		}
+		
+		// if rename
 		if (editfilename != originalfilename || editgroup != originalgroup) {
 			var c = listing.length;
 			var exists = false;
@@ -207,9 +211,9 @@
 			if (exists) {
 				alert(trans("Filename/group already exists."));
 			} else
-				$.post(ocUrl("ajax/v0.2/ownnote/ajaxren"), { name: originalfilename, group: originalgroup, newname: editfilename, newgroup: editgroup }, function (data) {
+				$.post(ocUrl("ajax/v0.2/ownnote/ajaxren"), { id: originalid, name: originalfilename, group: originalgroup, newname: editfilename, newgroup: editgroup }, function (data) {
 					if (data == "DONE") {
-						$.post(ocUrl("ajax/v0.2/ownnote/ajaxsave"), { name: editfilename, group: editgroup, content: content }, function (data) {
+						$.post(ocUrl("ajax/v0.2/ownnote/ajaxsave"), { id: originalid, content: content }, function (data) {
 							if (!stayinnote)
 								loadListing();
 							else {
@@ -219,8 +223,8 @@
 						});
 					}
 				});
-		} else {
-			$.post(ocUrl("ajax/v0.2/ownnote/ajaxsave"), { name: editfilename, group: editgroup, content: content }, function (data) {
+		} else {		// plain new content
+			$.post(ocUrl("ajax/v0.2/ownnote/ajaxsave"), { id: originalid, content: content }, function (data) {
 				if (!stayinnote)
 					loadListing();
 				else {

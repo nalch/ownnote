@@ -106,20 +106,20 @@ class OwnnoteApiController extends ApiController {
 	* @NoAdminRequired
 	* @NoCSRFRequired
 	*/
-	public function save($name, $group, $content) {
+	public function save($id, $content) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($name) && isset($group) && isset($content))
-			return $this->backend->saveNote($FOLDER, $name, $group, $content, 0);
+		if (isset($id) && isset($content))
+			return $this->backend->saveNote($FOLDER, $id, $content, 0);
 	}
 
 	/**
 	* @NoAdminRequired
 	* @NoCSRFRequired
 	*/
-	public function ren($name, $group, $newname, $newgroup) {
+	public function ren($id, $newname, $newgroup) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($name) && isset($newname) && isset($group) && isset($newgroup))
-			return $this->backend->renameNote($FOLDER, $name, $group, $newname, $newgroup);
+		if (isset($id) && isset($newname) && isset($newgroup))
+			return $this->backend->renameNote($FOLDER, $id, $newname, $newgroup);
 	}
 
 	/**

@@ -362,11 +362,13 @@ class Backend {
 		if (!$this->checkPermissions(\OCP\Constants::PERMISSION_DELETE, $nid)) {
 			return false;
 		}
+		
 		$now = new DateTime();
 		$mtime = $now->getTimestamp();
 		$uid = \OCP\User::getUser();
 		$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', deleted=1, mtime=? WHERE id=?");
 		$results = $query->execute(Array($mtime, $nid));
+		
 		$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote_parts WHERE id=?");
 		$query->execute(Array($nid));
 		if ($FOLDER != '') {
@@ -380,66 +382,66 @@ class Backend {
 	}
 
 
-	public function editNote($name, $group) {
-		$ret = "";
-//		$uid = \OCP\User::getUser();
-		$query = \OCP\DB::prepare("SELECT id, note FROM *PREFIX*ownnote WHERE name=? and grouping=?");
-		$results = $query->execute(Array($name, $group))->fetchAll();
+	public function editNote($id) {
+		$retVal = "";
+		$note = $this->getNote($id);
+		$content = $note['note'];
+
+		// query parts
+		$query = \OCP\DB::prepare("SELECT note FROM *PREFIX*ownnote_parts WHERE id=? order by pid");
+		$results = $query->execute(Array($note['id']))->fetchAll();
 		foreach($results as $result) {
-			$ret = $result['note'];
-			if ($ret == '') {
-				$query2 = \OCP\DB::prepare("SELECT note FROM *PREFIX*ownnote_parts WHERE id=? order by pid");
-				$results2 = $query2->execute(Array($result['id']))->fetchAll();
-				foreach($results2 as $result2) {
-					$ret .= $result2['note'];
-				}
-			}
+			$retVal .= $result['note'];
 		}
-		return $ret;
+
+		return $retVal;
 	}
 
-	public function saveNote($FOLDER, $name, $group, $content, $in_mtime) {
+	public function saveNote($FOLDER, $nid, $content, $in_mtime) {
 		$maxlength = 2621440; // 5 Megs (2 bytes per character)
 		$now = new DateTime();
 		$mtime = $now->getTimestamp();
-		if ($in_mtime != 0)
+		if ($in_mtime != 0) {
 			$mtime = $in_mtime;
-//		$uid = \OCP\User::getUser();
-		// First check to see if we're creating a new note, createNote handles all of this
-		$id = $this->createNote($FOLDER, $name, $group);
-		if ($id != -1) {
-			if ($FOLDER != '') {
-				$tmpfile = $FOLDER."/".$name.".htm";
-				if ($group != '')
-					$tmpfile = $FOLDER."/[".$group."] ".$name.".htm";
-					\OC\Files\Filesystem::file_put_contents($tmpfile, $content);
-				if ($info = \OC\Files\Filesystem::getFileInfo($tmpfile)) {
-					$mtime = $info['mtime'];
-				}
-			}
-			$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', mtime=? WHERE id=? and name=? and grouping=?");
-			$results = $query->execute(Array($mtime, $id, $name, $group));
-			$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote_parts WHERE id=?");
-			$results = $query->execute(Array($id));
-			$contentarr = $this->splitContent($content);
-			for ($i = 0; $i < count($contentarr); $i++) {
-				$query = \OCP\DB::prepare("INSERT INTO *PREFIX*ownnote_parts (id, note) values (?,?)");
-				$results = $query->execute(Array($id, $contentarr[$i]));
-			}
-
 		}
-		return "DONE";
+
+		// get the specific note
+		$note = $this->getNote($nid);
+		$name = $note['name'];
+		$group = $note['grouping'];
+				
+		if ($FOLDER != '') {
+			$tmpfile = $FOLDER."/".$name.".htm";
+			if ($group != '')
+				$tmpfile = $FOLDER."/[".$group."] ".$name.".htm";
+				\OC\Files\Filesystem::file_put_contents($tmpfile, $content);
+			if ($info = \OC\Files\Filesystem::getFileInfo($tmpfile)) {
+				$mtime = $info['mtime'];
+			}
+		}
+		$query = \OCP\DB::prepare("UPDATE *PREFIX*ownnote set note='', mtime=? WHERE id=?");
+		$results = $query->execute(Array($mtime, $note['id']));
+		$query = \OCP\DB::prepare("DELETE FROM *PREFIX*ownnote_parts WHERE id=?");
+		$results = $query->execute(Array($note['id']));
+		$contentarr = $this->splitContent($content);
+		for ($i = 0; $i < count($contentarr); $i++) {
+			$query = \OCP\DB::prepare("INSERT INTO *PREFIX*ownnote_parts (id, note) values (?,?)");
+			$results = $query->execute(Array($note['id'], $contentarr[$i]));
+		}
+		return true;
 	}
 
-	public function renameNote($FOLDER, $name, $group, $in_newname, $in_newgroup) {
+	public function renameNote($FOLDER, $id, $in_newname, $in_newgroup) {
 		$newname = str_replace("\\", "-", str_replace("/", "-", $in_newname));
 		$newgroup = str_replace("\\", "-", str_replace("/", "-", $in_newgroup));
+		
 		// We actually need to delete and create so that the delete flag exists for syncing clients
-		$content = $this->editNote($name, $group);
-		$this->deleteNote($FOLDER, $nid);
-		$this->createNote($FOLDER, $newname, $newgroup);
-		// BUG: Don't need createNote above?
-		$this->saveNote($FOLDER, $newname, $newgroup, $content, 0);
+		$content = $this->editNote($id);		
+		$this->deleteNote($FOLDER, $id);
+		
+		$newId = $this->createNote($FOLDER, $newname, $newgroup);
+		$this->saveNote($FOLDER, $newId, $content, 0);
+		
 		// the DONE is used in javascript
 		return "DONE";
 	}
@@ -477,15 +479,23 @@ class Backend {
 		\OCP\Config::setAppValue('ownnote', $option, $value);
 	}
 	
+	private function getNote($noteid) {
+		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping, mtime, note, deleted FROM *PREFIX*ownnote WHERE id=?");
+		return $query->execute(Array($noteid))->fetchAll()[0];
+	}
+	
 	private function checkPermissions($permission, $nid) {
 		// gather information
-		$shared_note = \OCP\Share::getItemSharedWith('ownnote', $nid, 'populated_shares')[0];
+		$uid = \OCP\User::getUser();
+		$note = $this->getNote($nid);
 		
 		// owner is allowed to change everything
-		if ($uid === $note.uid) {
+		if ($uid === $note['uid']) {
 			return true;
 		}
 		
+		// check share permissions
+		$shared_note = \OCP\Share::getItemSharedWith('ownnote', $nid, 'populated_shares')[0];
 		return $shared_note.permissions & $permission;
 	}
 }

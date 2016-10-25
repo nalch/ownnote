@@ -53,8 +53,8 @@ class OwnnoteAjaxController extends ApiController {
 	}
 
 	/**
-	* @NoAdminRequired
-	*/
+	 * @NoAdminRequired
+	 */
 	public function ajaxcreate($name, $group) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
 		if (isset($name) && isset($group))
@@ -62,13 +62,14 @@ class OwnnoteAjaxController extends ApiController {
 	}
 
 	/**
-        * @NoAdminRequired
-        */
-        public function ajaxshare($name, $group, $user) {
-                $FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-                if (isset($name) && isset($group) && isset($user))
-                        return $this->backend->shareNote($FOLDER, $name, $group, $user);
+     * @NoAdminRequired
+     */
+    public function ajaxshare($name, $group, $user) {
+        $FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
+        if (isset($name) && isset($group) && isset($user)) {
+            return $this->backend->shareNote($FOLDER, $name, $group, $user);
         }
+    }
 
 
 	/**
@@ -76,34 +77,37 @@ class OwnnoteAjaxController extends ApiController {
 	*/
 	public function ajaxdel($nid) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($nid))
+		if (isset($nid)) {
 			return $this->backend->deleteNote($FOLDER, $nid);
+		}
 	}
 
 	/**
 	* @NoAdminRequired
 	*/
-	public function ajaxedit($name, $group) {
-		if (isset($name) && isset($group))
-			return $this->backend->editNote($name, $group);
+	public function ajaxedit($nid) {
+		if (isset($nid)) {
+			return $this->backend->editNote($nid);
+		}
 	}
 
 	/**
 	* @NoAdminRequired
 	*/
-	public function ajaxsave($name, $group, $content) {
+	public function ajaxsave($id, $content) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($name) && isset($group) && isset($content))
-			return $this->backend->saveNote($FOLDER, $name, $group, $content, 0);
+		if (isset($id) && isset($content)) {
+			return $this->backend->saveNote($FOLDER, $id, $content, 0);
+		}
 	}
 
 	/**
 	* @NoAdminRequired
 	*/
-	public function ajaxren($name, $group, $newname, $newgroup) {
+	public function ajaxren($id, $newname, $newgroup) {
 		$FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-		if (isset($name) && isset($newname) && isset($group) && isset($newgroup))
-			return $this->backend->renameNote($FOLDER, $name, $group, $newname, $newgroup);
+		if (isset($id) && isset($newname) && isset($newgroup))
+			return $this->backend->renameNote($FOLDER, $id, $newname, $newgroup);
 	}
 
 	/**
