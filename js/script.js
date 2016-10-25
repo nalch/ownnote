@@ -212,7 +212,7 @@
 				alert(trans("Filename/group already exists."));
 			} else
 				$.post(ocUrl("ajax/v0.2/ownnote/ajaxren"), { id: originalid, name: originalfilename, group: originalgroup, newname: editfilename, newgroup: editgroup }, function (data) {
-					if (data == "DONE") {
+					if (data === true) {
 						$.post(ocUrl("ajax/v0.2/ownnote/ajaxsave"), { id: originalid, content: content }, function (data) {
 							if (!stayinnote)
 								loadListing();
@@ -741,14 +741,15 @@
 						exists = true;
 						break;
 					}
-			if (exists)
+			if (exists) {
 				alert(trans("Group already exists."));
-			else
+			} else {
 				$.post(ocUrl("ajax/v0.2/ownnote/ajaxrengroup"), { group: cg, newgroup: v }, function (data) {
 					switchgroup = v;
 					cg = "";
 					loadListing();
 				});
+			}
 		} else {
 			switchgroup = v;
 			cg = "";

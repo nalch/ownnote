@@ -442,8 +442,7 @@ class Backend {
 		$newId = $this->createNote($FOLDER, $newname, $newgroup);
 		$this->saveNote($FOLDER, $newId, $content, 0);
 		
-		// the DONE is used in javascript
-		return "DONE";
+		return true;
 	}
 
 	public function deleteGroup($FOLDER, $group) {
@@ -463,8 +462,7 @@ class Backend {
 		foreach($results as $result) {
 			$this->renameNote($FOLDER, $result['id'], $result['name'], $newgroup);
 		}
-		// the DONE is used in javascript
-		return "DONE";
+		return true;
 	}
 
 	public function getVersion() {
