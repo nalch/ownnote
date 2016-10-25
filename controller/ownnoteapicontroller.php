@@ -12,9 +12,6 @@
 namespace OCA\OwnNote\Controller;
 
 use \OCP\AppFramework\ApiController;
-use \OCP\AppFramework\Http\JSONResponse;
-use \OCP\AppFramework\Http\Response;
-use \OCP\AppFramework\Http;
 use \OCP\IRequest;
 use \OCA\OwnNote\Lib\Backend;
 
@@ -87,9 +84,10 @@ class OwnnoteApiController extends ApiController {
 	* @NoAdminRequired
 	* @NoCSRFRequired
 	*/
-	public function edit($name, $group) {
-		if (isset($name) && isset($group))
-			return $this->backend->editNote($name, $group);
+	public function edit($id) {
+		if (isset($id)) {
+			return $this->backend->editNote($id);
+		}
 	}
 
 	/**
