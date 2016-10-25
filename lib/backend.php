@@ -461,7 +461,7 @@ class Backend {
 		$query = \OCP\DB::prepare("SELECT id, name, grouping, mtime FROM *PREFIX*ownnote WHERE deleted=0 and uid=? and grouping=?");
 		$results = $query->execute(Array($uid, $group))->fetchAll();
 		foreach($results as $result) {
-			$this->renameNote($FOLDER, $result['name'], $group, $result['name'], $newgroup);
+			$this->renameNote($FOLDER, $result['id'], $result['name'], $newgroup);
 		}
 		// the DONE is used in javascript
 		return "DONE";
