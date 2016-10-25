@@ -194,7 +194,7 @@ class Backend {
 			// Create the folder if it doesn't exist
 			if (!\OC\Files\Filesystem::is_dir($FOLDER)) {
 				if (!\OC\Files\Filesystem::mkdir($FOLDER)) {
-					echo "ERROR: Could not create ownNote directory.";
+					\OCP\Util::writeLog('ownnote', 'Could not create ownNote directory.', \OCP\Util::ERROR);
 					exit;
 				}
 			}
@@ -202,7 +202,7 @@ class Backend {
 			$filearr = array();
 			if ($listing = \OC\Files\Filesystem::opendir($FOLDER)) {
 				if (!$listing) {
-					echo "ERROR: Error listing directory.";
+					\OCP\Util::writeLog('ownnote', 'Error listing directory.', \OCP\Util::ERROR);
 					exit;
 				}
 				while (($file = readdir($listing)) !== false) {
