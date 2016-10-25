@@ -93,16 +93,6 @@ class OwnnoteApiController extends ApiController {
 	}
 
 	/**
-        * @NoAdminRequired
-        * @NoCSRFRequired
-        */
-        public function share($name, $group, $user) {
-                $FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-                if (isset($name) && isset($group) && isset($user))
-                        return $this->backend->shareNote($FOLDER, $name, $group, $user);
-        }
-
-	/**
 	* @NoAdminRequired
 	* @NoCSRFRequired
 	*/

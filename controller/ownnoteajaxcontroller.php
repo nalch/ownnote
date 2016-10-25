@@ -62,17 +62,6 @@ class OwnnoteAjaxController extends ApiController {
 	}
 
 	/**
-     * @NoAdminRequired
-     */
-    public function ajaxshare($name, $group, $user) {
-        $FOLDER = \OCP\Config::getAppValue('ownnote', 'folder', '');
-        if (isset($name) && isset($group) && isset($user)) {
-            return $this->backend->shareNote($FOLDER, $name, $group, $user);
-        }
-    }
-
-
-	/**
 	* @NoAdminRequired
 	*/
 	public function ajaxdel($nid) {
