@@ -79,8 +79,13 @@ window.Ownnote.Share = {};
 				},
 				dataType: 'json'
 			}).done(function (result) {
-				if (callback) {
-					callback(result.ocs.data);
+				if (result) {
+					var data = {
+					  id: noteid
+					};
+					if (callback) {
+						callback(data);
+					}
 				}
 			}).fail(function (xhr) {
 				var result = xhr.responseJSON;
@@ -425,7 +430,7 @@ window.Ownnote.Share = {};
 								}
 								Ownnote.Share._addShareWith(data.id, shareType, shareWith,
 									selected.item.label,
-									permissions, posPermissions);
+									permissions, posPermissions, false, itemSource, false);
 							});
 						$input.prop('disabled', false);
 						$loading.addClass('hidden');
@@ -512,6 +517,7 @@ window.Ownnote.Share = {};
 				if (callback) {
 					callback.call();
 				}
+				loadListing();
 			});
 		},
 		/**
