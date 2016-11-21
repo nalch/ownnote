@@ -519,7 +519,8 @@
 		buildListing();
 	}
 
-	function buildNavItem(name, count, active, editable=true) {
+	function buildNavItem(name, count, active, editable) {
+	    editable = typeof editable !== 'undefined' ? editable : true;
 		var html = '';
 		var a = ''
 		var n = htmlQuotes(name);
