@@ -117,6 +117,7 @@
 		html += "	</div>";
 		html += "</div>";
 		html += "<div class='listingBlank'><!-- --></div>";
+		// the note is editable, if the current user is the owner or has edit permissions
 		var editableClass = (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE)) ? 'editable' : 'mceNonEditable';
 		html += "<div id='editable' class='"+editableClass+"'>";
 		html += data;
