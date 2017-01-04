@@ -481,7 +481,7 @@ class Backend {
 		$query = \OCP\DB::prepare("SELECT id, uid, name, grouping, mtime, note, deleted FROM *PREFIX*ownnote WHERE id=?");
 		return $query->execute(Array($noteid))->fetchAll()[0];
 	}
-	
+
 	private function checkPermissions($permission, $nid) {
 		// gather information
 		$uid = \OCP\User::getUser();
