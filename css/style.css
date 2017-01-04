@@ -162,6 +162,15 @@
 	opacity: 1;
 }
 
+.edit-note {
+    background-image: url('../../../core/img/actions/rename.svg');
+	opacity: 0.3;
+}
+
+.edit-note:hover {
+	opacity: 1;
+}
+
 .indent {
 	margin-left: 10pt;
 }

@@ -54,6 +54,17 @@
 		});
 	}
 
+    function showNote(id) {
+        var nid = $(this).attr('i');
+		var uid = $(this).attr('uid');
+		var n = $(this).attr('n');
+		var g = $(this).attr('g');
+		var p = $(this).attr('p');
+		$.post(ocUrl("ajax/v0.2/ownnote/ajaxedit"), { nid: nid }, function (data) {
+			buildEdit(nid, uid, n, g, p, data, false);
+		});
+    }
+
 	function editNote(id) {
 		var nid = $(this).attr('i');
 		var uid = $(this).attr('uid');
@@ -61,7 +72,7 @@
 		var g = $(this).attr('g');
 		var p = $(this).attr('p');
 		$.post(ocUrl("ajax/v0.2/ownnote/ajaxedit"), { nid: nid }, function (data) {
-			buildEdit(nid, uid, n, g, p, data);
+			buildEdit(nid, uid, n, g, p, data, true);
 		});
 	}
 
@@ -84,10 +95,12 @@
 		h = $(window).height() - o.top;
 	}
 
-	function buildEdit(id, uid, n, g, p, data) {
+	function buildEdit(id, uid, n, g, p, data, editable) {
 		resizeContainer();
 		var name = htmlQuotes(n);
 		var group = htmlQuotes(g);
+		var isEditable = editable && (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE));
+
 		var html = "";
 		html += "<div id='controls'>";
 		html += "	<div id='newfile' class='indent'>";
@@ -108,7 +121,7 @@
 		html += "			<input type='hidden' id='originalgroup' value='"+group+"'>";
 		html += "			<input type='hidden' id='originalid' value='"+id+"'>";
 		html += "			<input type='hidden' id='groupname' value='"+group+"'>";
-		if (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE)) {
+		if (isEditable) {
 			html += "			<div id='quicksave' class='button'>"+trans("Quick Save")+"</div>";
 			html += "			<div id='save' class='button'>"+trans("Save")+"</div>";
 		}
@@ -117,9 +130,11 @@
 		html += "	</div>";
 		html += "</div>";
 		html += "<div class='listingBlank'><!-- --></div>";
+
 		// the note is editable, if the current user is the owner or has edit permissions
-		var editableClass = (uid === OC.currentUser || (p & OC.PERMISSION_UPDATE)) ? 'editable' : 'mceNonEditable';
+		var editableClass = isEditable ? 'editable' : 'mceNonEditable'
 		html += "<div id='editable' class='"+editableClass+"'>";
+
 		html += data;
 		html += "</div>";
 		document.getElementById("ownnote").innerHTML = html;
@@ -401,6 +416,11 @@
 						if (filteredNotes[i].uid === OC.currentUser || (filteredNotes[i].permissions & OC.PERMISSION_DELETE)) {
 							html += "		<div id='"+file+"-delete' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons delete delete-note pointer'></div>";
 						}
+
+						// edit
+						if (filteredNotes[i].uid === OC.currentUser || (filteredNotes[i].permissions & OC.PERMISSION_UPDATE)) {
+							html += "		<div id='"+file+"-edit' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' p='"+filteredNotes[i].permissions+"' uid='"+filteredNotes[i].uid+"' class='buttons edit edit-note pointer'></div>";
+						}
 						
 						// share
 						html += "		<div id='"+file+"-share' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='share-note share pointer'>";
@@ -412,7 +432,6 @@
 						}
 						html += "			<div id='"+file+"' i='"+filteredNotes[i].id+"' n='"+name+"' g='"+group+"' class='buttons share share-note pointer'></div>";
 						html += "		</a>";
-						
 						html += "		</div>";
 						
 						html += "	</td>";
@@ -452,7 +471,8 @@
 	}
 
 	function bindListing() {
-		$(".file").bind("click", editNote);
+		$(".file").bind("click", showNote);
+		$(".edit-note").bind("click", editNote);
 		$(".delete-note").bind("click", deleteNote);
 		$("#sortname").bind("click", sortName);
 		$("#sortmod").bind("click", sortMod);
