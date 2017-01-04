@@ -359,8 +359,8 @@ class Backend {
 	}
 
 	public function deleteNote($FOLDER, $nid) {
-		if (!$this->checkPermissions(\OCP\Constants::PERMISSION_DELETE, $nid)) {
-			return false;
+	    if (!$this->checkPermissions(\OCP\Constants::PERMISSION_DELETE, $nid)) {
+	        return false;
 		}
 		
 		$now = new DateTime();
@@ -491,10 +491,10 @@ class Backend {
 		if ($uid === $note['uid']) {
 			return true;
 		}
-		
+
 		// check share permissions
 		$shared_note = \OCP\Share::getItemSharedWith('ownnote', $nid, 'populated_shares')[0];
-		return $shared_note.permissions & $permission;
+		return $shared_note['permissions'] & $permission;
 	}
 }
 
